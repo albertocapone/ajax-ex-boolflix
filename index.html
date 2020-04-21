@@ -17,10 +17,21 @@
         <h2>BOOLFLIX</h2>
         <form class="">
           <input type="text" name="" value="">
+          <button id="go" type="button" name="button">GO</button>
         </form>
       </div>
       <div class="search_results">
       </div>
     </div>
+
+    <script id="template_media" type="text/x-handlebars-template">
+      <div class="media">
+        <h3>{{title}}</h3>
+        <span>Titolo originale: {{originalTitle}}</span>
+        <span>Lingua originale: {{language}}</span>
+        <span>Voto: {{score}}</span>
+      </div>
+    </script>
+
   </body>
 </html>
