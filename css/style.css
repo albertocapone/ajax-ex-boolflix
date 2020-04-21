@@ -1,0 +1,45 @@
+*{
+  padding: 0;
+  border: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.super{
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 70px;
+}
+
+  .headbar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: black;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .headbar h2{
+    color: #E50914;
+    font-size: 30px;
+    font-weight: bolder;
+  }
+  .headbar input{
+    width: 250px;
+    height: 30px;
+    border-radius: 5px;
+  }
+  .search_results{
+    flex-basis: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.9)
+  }
