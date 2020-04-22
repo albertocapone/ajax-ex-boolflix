@@ -20,8 +20,17 @@ $(document).ready(
       }
     }
 
-    function rateIt(vote){
-      return; //stars
+    function rateIt(vote){       //questa funzione traduce il voto del media corrente in stelle
+      var starString = "";
+      var starredVote = Math.round(vote / 2);     //converto il voto
+      for (var stars = 0; stars < 5; stars++){
+        if (stars < starredVote) {              //per iterazioni inferiori alla valutazione in stelle
+          starString += "<i class='fas fa-star'></i>";   //aggiungi stella piena
+        } else {                                //per tutte le altre
+          starString += "<i class='far fa-star'></i>";  //aggiungi stella vuota
+        }
+      }
+      return starString;     //la funzione ritorna una stringa che verrò poi convertita in oggetti jquery da handlebars
     }
 
     function callTheAPI(query, searchingFor){
@@ -33,6 +42,7 @@ $(document).ready(
           query: query,                           //associo stringa ricerca utente
         },
         success: function (data){
+          console.log(data.results);
           var results = data.results;                //registro array di oggetti estratto dalla proprieta results dell'oggetto data
           for (var media of results){                 //ciclo su array results   (media == results[k] in un for classico)
             if(searchingFor == "movie"){
@@ -40,8 +50,8 @@ $(document).ready(
                 title: media.title,
                 originalTitle: media.original_title,
                 flag: displayLanguage(media.original_language, "img"),
-                language:  displayLanguage(media.original_language, "txt"),
-                score: media.vote_average
+                language: displayLanguage(media.original_language, "txt"),
+                score: rateIt(media.vote_average)
               }
             } else if (searchingFor == "tv") {
               var context = {                           //ad ogni iterazione sovrascrivo nell'oggetto context le proprieta di media di cui ho bisogno
@@ -49,7 +59,7 @@ $(document).ready(
                 originalTitle: media.original_name,
                 flag: displayLanguage(media.original_language, "img"),
                 language: displayLanguage(media.original_language, "txt"),
-                score: media.vote_average
+                score: rateIt(media.vote_average)
               }
             }
             searchResultsBox.append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
