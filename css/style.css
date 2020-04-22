@@ -48,6 +48,7 @@
         font-size: 15px;
         background-color: #E50914;
         color: white;
+        cursor: pointer;
       }
 
   .search_results{
