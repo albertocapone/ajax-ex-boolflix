@@ -68,6 +68,6 @@
         padding: 5px;
         border: 1px solid red;
       }
-      .media span{
-        display: block;
+      .media img{
+        vertical-align: middle;
       }
