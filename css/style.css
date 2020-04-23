@@ -63,6 +63,7 @@
   }
       .media{
         flex-basis: calc(100% / 3 - 20px);
+        min-width: 300px;
         min-height: 150px;
         margin: 5px 5px;
         padding: 5px;
@@ -71,6 +72,7 @@
       .media img{
         vertical-align: middle;
       }
-      .fas.fa-star{
-        /* color: white; */
+
+      img[src=""]{
+        display: none;
       }

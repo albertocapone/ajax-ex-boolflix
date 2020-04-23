@@ -8,10 +8,14 @@ $(document).ready(
       var toFlag = {          //creo un oggetto di corrispondenze codici paesi -> img paesi; ogni stringa-img verrà inserita in img all'interno del template
         it: "img/it.png",
         gb: "img/gb.png",
+        en: "img/gb.png",
         us: "img/us.png",
         fr: "img/fr.png",
+        de: "img/de.png",
         es: "img/es.png",
-        pt: "img/pt.png"
+        pt: "img/pt.png",
+        cn: "img/cn.png",
+        ru: "img/ru.png"
       };
       if(mode == "img"){
       return toFlag[language] || "";      //ritorno la stringa-img risultante dall' accesso all'oggetto attraverso il parametro language (che è la prop language del media corrente) oppure se non esiste una stinga vuota
@@ -33,6 +37,10 @@ $(document).ready(
       return starString;     //la funzione ritorna una stringa che verrò poi convertita in oggetti jquery da handlebars
     }
 
+    function displayCover (coverPath){
+        return (coverPath) ? "https://image.tmdb.org/t/p/"+ "/w300/" + coverPath : "";
+    }
+
     function callTheAPI(query, searchingFor){
       $.ajax({
         url: "https://api.themoviedb.org/3/search/" + searchingFor, //l'url viene modificato in base alla ricerca
@@ -42,11 +50,12 @@ $(document).ready(
           query: query,                           //associo stringa ricerca utente
         },
         success: function (data){
-          console.log(data.results);
           var results = data.results;                //registro array di oggetti estratto dalla proprieta results dell'oggetto data
+          console.log(results);
           for (var media of results){                 //ciclo su array results   (media == results[k] in un for classico)
             if(searchingFor == "movie"){
               var context = {                        //ad ogni iterazione sovrascrivo nell'oggetto context le proprieta di key di cui ho bisogno
+                cover: displayCover(media.poster_path),
                 title: media.title,
                 originalTitle: media.original_title,
                 flag: displayLanguage(media.original_language, "img"),
@@ -55,6 +64,7 @@ $(document).ready(
               }
             } else if (searchingFor == "tv") {
               var context = {                           //ad ogni iterazione sovrascrivo nell'oggetto context le proprieta di media di cui ho bisogno
+                cover: displayCover(media.poster_path),
                 title: media.name,
                 originalTitle: media.original_name,
                 flag: displayLanguage(media.original_language, "img"),
