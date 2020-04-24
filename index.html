@@ -26,24 +26,27 @@
 
     <script id="template_media" type="text/x-handlebars-template">
       <div class="media">
-        <img src="{{cover}}" alt="">
-        <h3>{{title}}</h3>
-        <span>Titolo originale: {{originalTitle}}</span>
-        <div class="">
-          Lingua:
-          <img src="{{flag}}" alt="">
-          {{language}}
-        </div>
-        <div class="">
-          Voto:
-          <div class="score">
-          {{{score}}}
+        <img class="covers" src="{{cover}}" alt="">
+        <div class="media_info">
+          <div>
+            <h3>{{title}}</h3>
+            <span>Titolo originale: {{originalTitle}}</span>
           </div>
+          <div class="">
+            Lingua:
+            <img class="flags" src="{{flag}}" alt="">
+            {{language}}
+          </div>
+          <div class="">
+            Voto:
+            <div class="score">
+            {{{score}}}
+            </div>
+          </div>
+          <p>Overview: {{overview}}</p>
         </div>
       </div>
     </script>
-
-
-
   </body>
+
 </html>

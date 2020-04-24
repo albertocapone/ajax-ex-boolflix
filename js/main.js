@@ -5,7 +5,7 @@ $(document).ready(
     var template = Handlebars.compile($('#template_media').html());  //predispongo template
 
     function displayLanguage(language, mode){  //a seconda del parametro mode gestisco l'alternanza tra display di immagine per una determinata lingua, se esiste, oppure display di testo, se non esiste
-      var toFlag = {          //creo un oggetto di corrispondenze codici paesi -> img paesi; ogni stringa-img verrà inserita in img all'interno del template
+      var toFlag = {
         it: "img/it.png",
         gb: "img/gb.png",
         en: "img/gb.png",
@@ -38,7 +38,7 @@ $(document).ready(
     }
 
     function displayCover (coverPath){
-        return (coverPath) ? "https://image.tmdb.org/t/p/"+ "/w300/" + coverPath : "";
+        return (coverPath) ? "https://image.tmdb.org/t/p/"+ "/w342/" + coverPath : "img/not-available.gif";
     }
 
     function callTheAPI(query, searchingFor){
@@ -48,33 +48,22 @@ $(document).ready(
         data: {
           api_key: "99778220f31eec4fabbbe1461237e9d0",  //mia api key
           query: query,                           //associo stringa ricerca utente
-        },
+          },
         success: function (data){
           var results = data.results;                //registro array di oggetti estratto dalla proprieta results dell'oggetto data
-          console.log(results);
           for (var media of results){                 //ciclo su array results   (media == results[k] in un for classico)
-            if(searchingFor == "movie"){
               var context = {                        //ad ogni iterazione sovrascrivo nell'oggetto context le proprieta di key di cui ho bisogno
                 cover: displayCover(media.poster_path),
-                title: media.title,
-                originalTitle: media.original_title,
+                title: (searchingFor == "movie") ? media.title : media.name,
+                originalTitle: (searchingFor == "movie") ? media.original_title : media.original_name ,
                 flag: displayLanguage(media.original_language, "img"),
                 language: displayLanguage(media.original_language, "txt"),
-                score: rateIt(media.vote_average)
+                score: rateIt(media.vote_average),
+                overview: media.overview || "non disponibile..."
               }
-            } else if (searchingFor == "tv") {
-              var context = {                           //ad ogni iterazione sovrascrivo nell'oggetto context le proprieta di media di cui ho bisogno
-                cover: displayCover(media.poster_path),
-                title: media.name,
-                originalTitle: media.original_name,
-                flag: displayLanguage(media.original_language, "img"),
-                language: displayLanguage(media.original_language, "txt"),
-                score: rateIt(media.vote_average)
-              }
+              searchResultsBox.append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
             }
-            searchResultsBox.append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
-        }
-        },
+          },
         error: function (request, state, errors){
           alert(errors);
         }
