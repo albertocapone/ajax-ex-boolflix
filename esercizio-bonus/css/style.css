@@ -6,6 +6,11 @@
   font-family: 'Roboto', sans-serif;
 }
 
+a{
+  text-decoration-line: none;
+  color: inherit;
+}
+
 /* width */
 ::-webkit-scrollbar {
   width: 9px;
@@ -84,7 +89,7 @@
           display: none;
         }
       }
-          li:hover{
+          li:hover, li.active{
             text-shadow: 0 0 .1em, 0 0 .3em;
             letter-spacing: 1.5px;
             cursor: pointer;

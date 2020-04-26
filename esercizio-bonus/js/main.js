@@ -2,7 +2,9 @@ $(document).ready(
   function() {
     // riferimenti html
     var logo = new CircleType(document.getElementById('logo')).radius(600);   //stilizzazione logo
-    var searchResultsBox = $('.search_results');
+    var searchButton = $('#go');
+    var headbarNavigationButtons = $('.headbar li');
+    var mediaBox = $('.media_box');
     var template = Handlebars.compile($('#template_media').html());  //predispongo template
 
     function displayLanguage(language, mode){  //a seconda del parametro mode gestisco l'alternanza tra display di immagine per una determinata lingua, se esiste, oppure display di testo, se non esiste
@@ -63,9 +65,9 @@ $(document).ready(
                 overview: media.overview || "non disponibile..."
               }
               if (searchingFor == "movie"){
-              $('.movies').append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
+              $('#movies').append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
             } else {
-              $('.tv-series').append(template(context));
+              $('#tv-series').append(template(context));
             }
             }
           },
@@ -75,10 +77,35 @@ $(document).ready(
       });
     }
 
-    $('#go').click(
+    //headbar and scrolling navigation
+    headbarNavigationButtons.click(
+      function () {
+        headbarNavigationButtons.each(function () { $(this).removeClass('active'); });
+        $(this).addClass('active');
+      }
+    );
+
+    mediaBox.scroll(
+      function() {
+          var at = mediaBox.scrollTop();
+          headbarNavigationButtons.each(function () { $(this).removeClass('active'); });
+          if (at <= 408) {
+            headbarNavigationButtons.eq(0).addClass('active');
+          } else if (at >= 409 && at <= 802) {
+            headbarNavigationButtons.eq(1).addClass('active');
+          } else if (at >= 803 && at <= 1172){
+            headbarNavigationButtons.eq(2).addClass('active');
+          } else {
+            headbarNavigationButtons.eq(3).addClass('active');
+          }
+      }
+    );
+
+    searchButton.click(
       function (){
         var userSearch = $('input').val(); //registro la stringa di ricerca inserita dall'utente
         callTheAPI(userSearch, "movie");
         callTheAPI(userSearch, "tv");
     });
+
 });
