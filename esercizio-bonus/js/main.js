@@ -1,7 +1,7 @@
 $(document).ready(
   function() {
-    var logo = new CircleType(document.getElementById('logo')).radius(600);
     // riferimenti html
+    var logo = new CircleType(document.getElementById('logo')).radius(600);   //stilizzazione logo
     var searchResultsBox = $('.search_results');
     var template = Handlebars.compile($('#template_media').html());  //predispongo template
 
@@ -62,7 +62,11 @@ $(document).ready(
                 score: rateIt(media.vote_average),
                 overview: media.overview || "non disponibile..."
               }
-              searchResultsBox.append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
+              if (searchingFor == "movie"){
+              $('.movies').append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
+            } else {
+              $('.tv-series').append(template(context));
+            }
             }
           },
         error: function (request, state, errors){
@@ -73,7 +77,6 @@ $(document).ready(
 
     $('#go').click(
       function (){
-        searchResultsBox.html("");  //pulisco la box coi risultati di ricerca
         var userSearch = $('input').val(); //registro la stringa di ricerca inserita dall'utente
         callTheAPI(userSearch, "movie");
         callTheAPI(userSearch, "tv");
