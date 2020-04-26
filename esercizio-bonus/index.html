@@ -24,6 +24,7 @@
           <li><a href="#movies">MOVIES</a></li>
           <li><a href="#tv-series">TV-SERIES</a></li>
           <li><a href="#favourites">FAVOURITES</a></li>
+          <li><a href="#search">SEARCH</a></li>
           <li>GENRES</li>
         </ul>
         <form class="">
@@ -33,16 +34,24 @@
       </div>
 
       <div class="media_box">
+        <h2>POPULAR</h2>
         <div id="popular">
 
         </div>
+        <h2>MOVIES</h2>
         <div id="movies">
 
         </div>
+        <h2>TV-SERIES</h2>
         <div id="tv-series">
 
         </div>
+        <h2>FAVOURITES</h2>
         <div id="favourites">
+
+        </div>
+        <h2>SEARCH</h2>
+        <div id="search">
 
         </div>
       </div>
@@ -52,9 +61,12 @@
       <div class="media">
         <img class="covers" src="{{cover}}" alt="">
         <div class="media_info">
+          <div class="addTo">
+            <i class="fas fa-bookmark"></i>
+          </div>
           <div>
             <h3>{{title}}</h3>
-            <span>Titolo originale: {{originalTitle}}</span>
+            <span class="sorting_title">Titolo originale: {{originalTitle}}</span>
           </div>
           <div class="">
             Lingua:

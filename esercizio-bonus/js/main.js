@@ -2,10 +2,20 @@ $(document).ready(
   function() {
     // riferimenti html
     var logo = new CircleType(document.getElementById('logo')).radius(600);   //stilizzazione logo
-    var searchButton = $('#go');
-    var headbarNavigationButtons = $('.headbar li');
-    var mediaBox = $('.media_box');
     var template = Handlebars.compile($('#template_media').html());  //predispongo template
+    var key = "99778220f31eec4fabbbe1461237e9d0";
+
+    var mediaBox = $('.media_box');
+    var popularBox = $('#popular');
+    var moviesBox = $('#movies');
+    var seriesBox = $('#tv-series');
+    var searchResultsBox = $('#search');
+    var favouritesBox = $('#favourites');
+
+    var headbarNavigationButtons = $('.headbar li');
+    var searchButton = $('#go');
+
+
 
     function displayLanguage(language, mode){  //a seconda del parametro mode gestisco l'alternanza tra display di immagine per una determinata lingua, se esiste, oppure display di testo, se non esiste
       var toFlag = {
@@ -44,14 +54,11 @@ $(document).ready(
         return (coverPath) ? "https://image.tmdb.org/t/p/"+ "/w342/" + coverPath : "img/not-available.gif";
     }
 
-    function callTheAPI(query, searchingFor){
+    function callTheAPI(callType, searchingFor, data, appendTo) {
       $.ajax({
-        url: "https://api.themoviedb.org/3/search/" + searchingFor, //l'url viene modificato in base alla ricerca
+        url: "https://api.themoviedb.org/3/" + callType + "/" + searchingFor,   //l'url viene modificato in base alla ricerca
         method: "GET",
-        data: {
-          api_key: "99778220f31eec4fabbbe1461237e9d0",  //mia api key
-          query: query,                           //associo stringa ricerca utente
-          },
+        data: data,
         success: function (data){
           var results = data.results;                //registro array di oggetti estratto dalla proprieta results dell'oggetto data
           for (var media of results){                 //ciclo su array results   (media == results[k] in un for classico)
@@ -64,13 +71,9 @@ $(document).ready(
                 score: rateIt(media.vote_average),
                 overview: media.overview || "non disponibile..."
               }
-              if (searchingFor == "movie"){
-              $('#movies').append(template(context));   //inietto nel box dei risultati di ricerca il mio template valorizzato attraverso l'oggetto context dell'iterazione corrente
-            } else {
-              $('#tv-series').append(template(context));
-            }
-            }
-          },
+              appendTo.append(template(context));
+          }
+        },
         error: function (request, state, errors){
           alert(errors);
         }
@@ -89,23 +92,71 @@ $(document).ready(
       function() {
           var at = mediaBox.scrollTop();
           headbarNavigationButtons.each(function () { $(this).removeClass('active'); });
-          if (at <= 408) {
+          if (at <= 513) {
             headbarNavigationButtons.eq(0).addClass('active');
-          } else if (at >= 409 && at <= 802) {
+          } else if (at >= 514 && at <= 961) {
             headbarNavigationButtons.eq(1).addClass('active');
-          } else if (at >= 803 && at <= 1172){
+          } else if (at >= 962 && at <= 1414){
             headbarNavigationButtons.eq(2).addClass('active');
-          } else {
+          } else if (at >= 1415 && at <= 1899) {
             headbarNavigationButtons.eq(3).addClass('active');
+          } else {
+            headbarNavigationButtons.eq(4).addClass('active');
           }
       }
     );
 
+    //search
     searchButton.click(
       function (){
-        var userSearch = $('input').val(); //registro la stringa di ricerca inserita dall'utente
-        callTheAPI(userSearch, "movie");
-        callTheAPI(userSearch, "tv");
+        searchResultsBox.html("");
+        callTheAPI("search", "movie", {
+          api_key: key,
+          query: $('input').val()   //registro la stringa di ricerca inserita dall'utente
+        }, searchResultsBox);
+        callTheAPI("search", "tv", {
+          api_key: key,
+          query: $('input').val()    //registro la stringa di ricerca inserita dall'utente
+        }, searchResultsBox);
+      //sposta scrollbar
     });
 
+    //add to favourites
+    mediaBox.on("click", ".fa-bookmark",
+      function() {
+        if ($(this).hasClass('active')){
+          var bookmarkedMedia = $(this).parents('.media');
+          favouritesBox.find(bookmarkedMedia).remove();
+          $('.media').each( function () {
+            if ( $(this).find('.sorting_title').html() == bookmarkedMedia.find('.sorting_title').html() ) {
+              $(this).find(".fa-bookmark").removeClass('active');
+            }
+          });
+        } else {
+          var toBookmarkMedia = $(this).parents('.media');
+          favouritesBox.append(toBookmarkMedia.clone());
+          $('.media').each( function () {
+            if ( $(this).find('.sorting_title').html() == toBookmarkMedia.find('.sorting_title').html() ) {
+              $(this).find(".fa-bookmark").addClass('active');
+            }
+          });
+        }
+      }
+    );
+
+    //genre filter
+
+    //start page API calls
+    callTheAPI("discover", "movie",{
+      api_key: key,
+      sort_by: "popularity.desc"
+    }, popularBox);
+    callTheAPI("discover", "movie",{
+      api_key: key,
+      sort_by: "release_date.desc"
+    }, moviesBox) ;
+    callTheAPI("discover", "tv",{
+      api_key: key,
+      sort_by: "release_date.desc"
+    }, seriesBox);
 });
