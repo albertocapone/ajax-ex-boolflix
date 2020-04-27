@@ -1,10 +1,12 @@
 $(document).ready(
   function() {
-    // riferimenti html
+    //riferimenti html
+
+    // varie
     var logo = new CircleType(document.getElementById('logo')).radius(600);   //stilizzazione logo
-    var template = Handlebars.compile($('#template_media').html());  //predispongo template
     var key = "99778220f31eec4fabbbe1461237e9d0";
 
+    //contenitori
     var mediaBox = $('.media_box');
     var popularBox = $('#popular');
     var moviesBox = $('#movies');
@@ -12,7 +14,9 @@ $(document).ready(
     var searchResultsBox = $('#search');
     var favouritesBox = $('#favourites');
 
-    var headbarNavigationButtons = $('.headbar li');
+    //bottoni
+    var headbarNavigationButtons = $('.headbar a');
+    var genresButton = $('#genre_button');
     var searchButton = $('#go');
 
 
@@ -54,23 +58,26 @@ $(document).ready(
         return (coverPath) ? "https://image.tmdb.org/t/p/"+ "/w342/" + coverPath : "img/not-available.gif";
     }
 
-    function callTheAPI(callType, searchingFor, data, appendTo) {
+    function getMedia(callType, searchingFor, data, appendTo) {
       $.ajax({
         url: "https://api.themoviedb.org/3/" + callType + "/" + searchingFor,   //l'url viene modificato in base alla ricerca
         method: "GET",
         data: data,
         success: function (data){
+          var template = Handlebars.compile($('#template_media').html());
           var results = data.results;                //registro array di oggetti estratto dalla proprieta results dell'oggetto data
           for (var media of results){                 //ciclo su array results   (media == results[k] in un for classico)
               var context = {                        //ad ogni iterazione sovrascrivo nell'oggetto context le proprieta di key di cui ho bisogno
                 cover: displayCover(media.poster_path),
-                title: (searchingFor == "movie") ? media.title : media.name,
-                originalTitle: (searchingFor == "movie") ? media.original_title : media.original_name ,
+                title: (searchingFor == "tv") ? media.name : media.title,
+                originalTitle: (searchingFor == "tv") ? media.original_name : media.original_title,
                 flag: displayLanguage(media.original_language, "img"),
                 language: displayLanguage(media.original_language, "txt"),
                 score: rateIt(media.vote_average),
-                overview: media.overview || "non disponibile..."
-              }
+                overview: media.overview || "non disponibile...",
+                genreData: media.genre_ids,
+                // genre: stringifyGenres(media.genre_ids, searchingFor, function(data) {return data;})
+              };
               appendTo.append(template(context));
           }
         },
@@ -80,14 +87,68 @@ $(document).ready(
       });
     }
 
-    //headbar and scrolling navigation
+    //recupero lista generi da API
+    function getGenres() {
+      for (var its = 0, type = "movie"; its < 2; its++, type = "tv"){
+      $.ajax({
+        url: "https://api.themoviedb.org/3/genre/" + type + "/list?",   //l'url viene modificato in base alla ricerca
+        method: "GET",
+        data: {
+          api_key: key,
+        },
+        success: function (data){
+          var template = Handlebars.compile($('#template_genreFilter_options').html());
+          var genresList = [];
+          for (var entry of data.genres){
+          if ( !genresList.some(item => item.id === entry.id) ) {
+          genresList.push(entry);
+          var context = {
+            genreName: entry.name,
+            genreCode: entry.id
+          };
+          $('#genre_button + select').append(template(context));
+        }
+      }
+      },
+        error: function (request, state, errors){
+          alert(errors);
+        }
+      });
+    }
+  }
+
+  // function stringifyGenres(mediaGenreCodes, type, callback) {
+  //   $.ajax({
+  //     url: "https://api.themoviedb.org/3/genre/" + type + "/list?",   //l'url viene modificato in base alla ricerca
+  //     method: "GET",
+  //     data: {
+  //       api_key: key,
+  //     },
+  //     success: function (data){
+  //       mediaGenreCodes = (typeof mediaGenreCodes === "string") ? mediaGenreCodes.split(",") : [mediaGenreCodes];
+  //       var genreString = "";
+  //     for (var it = 0; it < mediaGenreCodes.length; it++){
+  //       for (var entry of data.genres){
+  //         if (mediaGenreCodes[it] == entry.id) {
+  //            genreString += entry.name;
+  //          }
+  //       }
+  //     }
+  //     callback(genreString);
+  //   },
+  //     error: function (request, state, errors){
+  //       alert(errors);
+  //     }
+  //   });
+  // }
+
+    //navigazione da bottoni headbar e relativo aggiornamento scrollbar
     headbarNavigationButtons.click(
       function () {
         headbarNavigationButtons.each(function () { $(this).removeClass('active'); });
         $(this).addClass('active');
       }
     );
-
     mediaBox.scroll(
       function() {
           var at = mediaBox.scrollTop();
@@ -106,22 +167,22 @@ $(document).ready(
       }
     );
 
-    //search
+    //ricerca manuale
     searchButton.click(
       function (){
         searchResultsBox.html("");
-        callTheAPI("search", "movie", {
+        getMedia("search", "movie", {
           api_key: key,
-          query: $('input').val()   //registro la stringa di ricerca inserita dall'utente
+          query: $('input').val()
         }, searchResultsBox);
-        callTheAPI("search", "tv", {
+        getMedia("search", "tv", {
           api_key: key,
-          query: $('input').val()    //registro la stringa di ricerca inserita dall'utente
+          query: $('input').val()
         }, searchResultsBox);
-      //sposta scrollbar
+      //porta scrollbar in basso
     });
 
-    //add to favourites
+    //aggiungi a preferiti
     mediaBox.on("click", ".fa-bookmark",
       function() {
         if ($(this).hasClass('active')){
@@ -141,22 +202,50 @@ $(document).ready(
             }
           });
         }
-      }
-    );
+      });
 
-    //genre filter
 
-    //start page API calls
-    callTheAPI("discover", "movie",{
+    //filtro per generi
+    genresButton.click(
+      function() {
+        $(this).toggleClass('active');
+        $(this).siblings('select').toggle();
+          $(this).siblings('select').click(
+            function() {
+              var filter = $(this).val();
+              if (filter == "all"){
+                $('.media').each( function () { $(this).show(); } );
+              } else {
+              $('.media').each( function () {
+                var mediaGenreCodes = $(this).data("genre");
+                mediaGenreCodes = (typeof mediaGenreCodes === "string") ? mediaGenreCodes.split(",") : [mediaGenreCodes];
+                if (mediaGenreCodes.some(item => item == filter)) {
+                  $(this).show();
+                } else {
+                  $(this).hide();
+                }
+              });
+            }
+        });
+    });
+
+    //chiamate API di default
+    getGenres();
+    getMedia("discover", "movie",{
       api_key: key,
       sort_by: "popularity.desc"
     }, popularBox);
-    callTheAPI("discover", "movie",{
+    getMedia("discover", "tv",{
       api_key: key,
-      sort_by: "release_date.desc"
+      sort_by: "popularity.desc"
+    }, popularBox);
+    getMedia("discover", "movie",{
+      api_key: key,
+      sort_by: "primary_release_date.desc"
     }, moviesBox) ;
-    callTheAPI("discover", "tv",{
+    getMedia("discover", "tv",{
       api_key: key,
-      sort_by: "release_date.desc"
+      sort_by: "primary_release_date.desc"
     }, seriesBox);
+
 });

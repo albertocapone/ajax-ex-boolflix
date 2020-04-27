@@ -25,7 +25,12 @@
           <li><a href="#tv-series">TV-SERIES</a></li>
           <li><a href="#favourites">FAVOURITES</a></li>
           <li><a href="#search">SEARCH</a></li>
-          <li>GENRES</li>
+          <li>
+              <span id="genre_button">GENRES</span>
+              <select>
+                <option value="all">All</option>
+              </select>
+          </li>
         </ul>
         <form class="">
           <input type="text" name="" value="">
@@ -58,7 +63,7 @@
     </div>
 
     <script id="template_media" type="text/x-handlebars-template">
-      <div class="media">
+      <div class="media" data-genre={{genreData}}>
         <img class="covers" src="{{cover}}" alt="">
         <div class="media_info">
           <div class="addTo">
@@ -79,10 +84,17 @@
             {{{score}}}
             </div>
           </div>
+          <!-- <p>Genre: {{genre}}</p> -->
           <p>Overview: {{overview}}</p>
         </div>
       </div>
     </script>
+
+    <script id="template_genreFilter_options" type="text/x-handlebars-template">
+      <option value={{genreCode}}>{{genreName}}</option>
+    </script>
+
+
   </body>
 
 </html>
