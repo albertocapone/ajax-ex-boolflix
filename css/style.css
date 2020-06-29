@@ -16,6 +16,7 @@ body {
   padding-top: 75px;
 }
 
+
 /* scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -124,7 +125,7 @@ i.go {
 
 .media_box>*:not(h2) {
   width: 100%;
-  min-height: 90%;
+  min-height: 85%;
   margin-top: 20px;
   display: flex;
   align-items: stretch;
@@ -210,6 +211,7 @@ i.go {
   flex-basis: 50%;
   overflow-y: scroll;
 }
+
 
 .score{
   flex: 0 0.5;
@@ -301,6 +303,10 @@ footer h6 {
     display: none;
   }
 
+  .media_box>*:not(h2) {
+    min-height: 55%;
+  }
+
   .media {
     min-width: calc(100% / 3 - 10px);
     margin: 5px 5px;
@@ -335,5 +341,21 @@ footer h6 {
   .media {
     min-width: calc(100% / 2 - 10px);
     margin: 5px 5px;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .sorting_title, .language {
+    display: none;
+  }
+
+  .overview {
+    font-size: 11px;
+  }
+
+  .score {
+    font-size: 10px;
   }
 }
