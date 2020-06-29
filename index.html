@@ -14,9 +14,7 @@
   </head>
   <body>
     <div class="headbar">
-      <div class="">
         <h2 id="logo">BOOLFLIX</h2>
-      </div>
       <ul>
         <li><a href="#popular">POPULAR</a></li>
         <li><a href="#movies">MOVIES</a></li>
@@ -32,7 +30,6 @@
       </ul>
       <form class="">
         <input type="text" name="search" value="">
-        <!-- <button class="go" type="button" name="button">GO</button> -->
         <i class="fas fa-search go"></i>
       </form>
     </div>
@@ -72,22 +69,39 @@
             <i class="fas fa-bookmark"></i>
           </div>
           <div>
-            <h3>{{title}}</h3>
-            <span class="sorting_title">Titolo originale: {{originalTitle}}</span>
+            <h3 class="title">{{title}}</h3>
+            <span class="sorting_title">
+              <span>
+                Titolo originale:
+              </span>
+              <span>
+                {{originalTitle}}
+              </span>
+            </span>
           </div>
-          <div class="">
-            Lingua:
+          <div class="language">
+            <span>
+              Lingua originale:
+            </span>
             <img class="flags" src="{{flag}}" alt="">
             {{language}}
           </div>
-          <div class="">
-            Voto:
-            <div class="score">
-            {{{score}}}
-            </div>
+          <p class="overview">
+            <span>
+              OVERVIEW
+            </span>
+            <span>
+              {{overview}}
+            </span>
+          </p>
+          <div class="score">
+            <span>
+              SCORE
+            </span>
+            <span>
+              {{{score}}}
+            </span>
           </div>
-          <!-- <p>Genre: {{genre}}</p> -->
-          <p>Overview: {{overview}}</p>
         </div>
       </div>
     </script>

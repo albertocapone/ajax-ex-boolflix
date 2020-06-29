@@ -95,7 +95,7 @@ function getMedia(callType, searchingFor, data, appendTo) {
           flag: displayLanguage(media.original_language, "img"),
           language: displayLanguage(media.original_language, "txt"),
           score: rateIt(media.vote_average),
-          overview: media.overview || "non disponibile...",
+          overview: media.overview || "[...]",
           genreData: media.genre_ids,
         };
         appendTo.append(template(context));
