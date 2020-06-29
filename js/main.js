@@ -14,6 +14,8 @@ function initVars() {
    headbarNavigationButtons = $('.headbar a');
    genresButton = $('#genre_button');
    searchButton = $('.go');
+  //preferiti
+   bookmarked = [];
 }
 
 function headbarNavigation() {
@@ -63,7 +65,7 @@ function displayLanguage(language, mode) {
 
 function rateIt(vote) { 
   var starString = "";
-  var starredVote = Math.round(vote / 2); 
+  var starredVote = (vote == 0) ? 1 : Math.round(vote / 2);
   for (var stars = 0; stars < 5; stars++) {
     if (stars < starredVote) { 
       starString += "<i class='fas fa-star'></i>"; 
@@ -86,9 +88,10 @@ function getMedia(callType, searchingFor, data, appendTo) {
     success: function (data) {
       var template = Handlebars.compile($('#template_media').html());
       var results = data.results; 
-      results = results.filter((elm) => elm.poster_path);
+      results = results.filter((elm) => elm.poster_path && elm.overview && elm.overview !== "Plot unknown.");
       for (var media of results) { 
         var context = { 
+          id: media.id,
           cover: displayCover(media.poster_path),
           title: (searchingFor == "tv") ? media.name : media.title,
           originalTitle: (searchingFor == "tv") ? media.original_name : media.original_title,
@@ -100,6 +103,14 @@ function getMedia(callType, searchingFor, data, appendTo) {
           category: searchingFor.toUpperCase()
         };
         appendTo.append(template(context));
+      }
+      if (callType === "search") {
+        searchResultsBox.find('.media').each(function() {
+          console.log(bookmarked, $(this).data('id'), bookmarked.includes($(this).data('id')))
+            if ( bookmarked.includes($(this).data('id'))) {
+                $(this).find('.fa-bookmark').addClass('active');
+            }
+        });
       }
     },
     error: function (request, state, errors) {
@@ -150,24 +161,29 @@ function getGenres() {
   }
 }
 
+
 function manageFavourites() {
-  // if ($(this).hasClass('active')) {
-  //   var bookmarkedMedia = $(this).parents('.media');
-  //   favouritesBox.find(bookmarkedMedia).remove();
-  //   $('.media').each(function () {
-  //     if ($(this).find('.sorting_title').html() == bookmarkedMedia.find('.sorting_title').html()) {
-  //       $(this).find(".fa-bookmark").removeClass('active');
-  //     }
-  //   });
-  // } else {
-  //   var toBookmarkMedia = $(this).parents('.media');
-  //   favouritesBox.append(toBookmarkMedia.clone());
-  //   $('.media').each(function () {
-  //     if ($(this).find('.sorting_title').html() == toBookmarkMedia.find('.sorting_title').html()) {
-  //       $(this).find(".fa-bookmark").addClass('active');
-  //     }
-  //   });
-  // }
+
+  if (!$(this).hasClass('active')) {
+    var idMedia = $(this).parents('.media').data('id');
+    bookmarked.push(idMedia);
+    favouritesBox.append($(this).parents('.media').clone());
+    $('.media').each(function () {
+      if ($(this).data('id') === idMedia)
+        $(this).find('.fa-bookmark').addClass('active');
+    });
+  } else {
+    var idMedia = $(this).parents('.media').data('id');
+    $('.media').each(function () {
+      if ($(this).data('id') === idMedia)
+        $(this).find('.fa-bookmark').removeClass('active');
+    });
+    favouritesBox.children().each(function () {
+       if ($(this).data('id') === idMedia)
+        $(this).remove();
+    });
+    bookmarked = bookmarked.filter((id) => id !== idMedia);
+  }
 }
 
 function filterForGenre() {
