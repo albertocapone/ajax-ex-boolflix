@@ -64,10 +64,13 @@
     <script id="template_media" type="text/x-handlebars-template">
       <div class="media" data-genre={{genreData}}>
         <img class="covers" src="{{cover}}" alt="">
+
         <div class="media_info">
+
           <div class="addTo">
             <i class="fas fa-bookmark"></i>
           </div>
+
           <div>
             <h3 class="title">{{title}}</h3>
             <span class="sorting_title">
@@ -101,6 +104,9 @@
             <span>
               {{{score}}}
             </span>
+          </div>
+          <div class="category">
+            {{category}}
           </div>
         </div>
       </div>

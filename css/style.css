@@ -185,7 +185,8 @@ i.go {
 .sorting_title > span:first-child,
 .overview>span:first-child,
 .language > span,
-.score > span:first-child {
+.score > span:first-child,
+.category {
   color: gold;
 }
 
@@ -212,18 +213,23 @@ i.go {
   overflow-y: scroll;
 }
 
-
 .score{
+  display: inline-block;
   flex: 0 0.5;
   font-size: 12px;
+}
+
+.category {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 8px;
 }
 
 .media:hover {
   box-shadow: 1px 1px 10px 15px rgba(255, 0, 0, 0.4);
   transform: scale(0.9);
 }
-
-
 
 img.covers {
   width: 100%;
@@ -237,10 +243,6 @@ img.flags {
 
 .flags[src=""] {
   display: none;
-}
-
-.score {
-  display: inline-block;
 }
 
 .fa-star {
@@ -357,5 +359,9 @@ footer h6 {
 
   .score {
     font-size: 10px;
+  }
+
+  .category {
+    font-size: 6px;
   }
 }

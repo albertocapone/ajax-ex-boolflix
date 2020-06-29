@@ -97,6 +97,7 @@ function getMedia(callType, searchingFor, data, appendTo) {
           score: rateIt(media.vote_average),
           overview: media.overview || "[...]",
           genreData: media.genre_ids,
+          category: searchingFor.toUpperCase()
         };
         appendTo.append(template(context));
       }
