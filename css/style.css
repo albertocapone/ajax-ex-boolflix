@@ -271,6 +271,10 @@ footer h6 {
 }
 
 @media only screen and (max-width:699px) {
+  body {
+    font-size: 10px;
+  }
+
   .headbar #logo {
     font-size: 30px;
   }
