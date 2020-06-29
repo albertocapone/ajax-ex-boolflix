@@ -16,7 +16,7 @@
       <div class="headbar">
           <h2 id="logo">BOOLFLIX</h2>
         <ul>
-          <li><a href="#popular">POPULAR</a></li>
+          <li><a href="#latest">POPULAR</a></li>
           <li><a href="#movies">MOVIES</a></li>
           <li><a href="#tv-series">TV-SERIES</a></li>
           <li><a href="#favourites">FAVOURITES</a></li>
@@ -35,8 +35,8 @@
       </div>
   
       <div class="media_box">
-        <h2>POPULAR</h2>
-        <div id="popular">
+        <h2>LATEST</h2>
+        <div id="latest">
   
         </div>
         <h2>MOVIES</h2>
@@ -72,7 +72,7 @@
           </div>
 
           <div>
-            <h3 class="title">{{title}}</h3>
+            <h3 class="title">{{title}} ({{year}})</h3>
             <span class="sorting_title">
               <span>
                 Titolo originale:
@@ -88,6 +88,9 @@
             </span>
             <img class="flags" src="{{flag}}" alt="">
             {{language}}
+          </div>
+          <div class="genre">
+
           </div>
           <p class="overview">
             <span>
