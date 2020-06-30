@@ -321,7 +321,7 @@ footer h6 {
 
 #myPortfolio {
   font-weight: 100;
-  font-size: 10px;
+  font-size: 8px;
 }
 
 #myPortfolio:hover {
@@ -391,6 +391,11 @@ footer h6 {
   }
 
   .category {
+    font-size: 6px;
+  }
+
+  #myPortfolio {
+    font-weight: 100;
     font-size: 6px;
   }
 }

@@ -50,14 +50,16 @@ function displayLanguage(language, mode) {
   var toFlag = {
     it: "img/it.png",
     gb: "img/gb.png",
-    en: "img/gb.png",
+    en: "img/en.png",
     us: "img/us.png",
     fr: "img/fr.png",
     de: "img/de.png",
     es: "img/es.png",
     pt: "img/pt.png",
-    cn: "img/cn.png",
-    ru: "img/ru.png"
+    cn: "img/zh.png",
+    ru: "img/ru.png",
+    ja: "img/ja.png",
+    zh: "img/zh.png"
   };
   if (mode == "img") {
     return toFlag[language] || ""; 
@@ -91,7 +93,7 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
     success: function (data) {
       var template = Handlebars.compile($('#template_media').html());
       var results = data.results; 
-      results = results.filter((elm) => elm.poster_path && elm.overview.length > 25);
+      results = results.filter((elm) => elm.poster_path && elm.overview.length > 25 && elm.id != 10784);
 
       for (var media of results) { 
         var checkDate = (searchingFor == "tv") ? media.first_air_date : media.release_date;
@@ -262,12 +264,12 @@ function init() {
   getGenres();
   getMedia("discover", "movie", {
     api_key: key,
-    sort_by: "release_date.desc, popularity.desc, vote_average.desc",
+    sort_by: "release_date.desc",
     page: 1
   }, latestBox);
   getMedia("discover", "tv", {
     api_key: key,
-    sort_by: "release_date.desc, popularity.desc, vote_average.desc",
+    sort_by: "release_date.desc",
     page: 1
   }, latestBox);
   getMedia("discover", "movie", {
