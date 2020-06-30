@@ -14,6 +14,8 @@ function initVars() {
    headbarNavigationButtons = $('.headbar a');
    genresButton = $('#genre_button');
    searchButton = $('.go');
+   //form
+   searchInput = $('.headbar > form');
   //preferiti
    bookmarked = [];
 }
@@ -27,16 +29,17 @@ function headbarNavigation() {
 
 function scrollbarHeadbarSync() {
    var at = mediaBox.scrollTop();
+   console.log(at)
    headbarNavigationButtons.each(function () {
      $(this).removeClass('active');
    });
-   if (at <= 513) {
+   if (at <= 330) {
      headbarNavigationButtons.eq(0).addClass('active');
-   } else if (at >= 514 && at <= 961) {
+   } else if (at >= 331 && at <= 731) {
      headbarNavigationButtons.eq(1).addClass('active');
-   } else if (at >= 962 && at <= 1414) {
+   } else if (at >= 732 && at <= 1100) {
      headbarNavigationButtons.eq(2).addClass('active');
-   } else if (at >= 1415 && at <= 1899) {
+   } else if (at >= 1101 && at <= 1533) {
      headbarNavigationButtons.eq(3).addClass('active');
    } else {
      headbarNavigationButtons.eq(4).addClass('active');
@@ -91,6 +94,7 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
       results = results.filter((elm) => elm.poster_path && elm.overview.length > 25);
 
       for (var media of results) { 
+        var checkDate = (searchingFor == "tv") ? media.first_air_date : media.release_date;
         var context = { 
           id: media.id,
           cover: displayCover(media.poster_path),
@@ -101,7 +105,7 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
           score: rateIt(media.vote_average),
           overview: media.overview,
           genreData: media.genre_ids,
-          year: ( (searchingFor == "tv") ?  media.first_air_date : media.release_date ).substring(0, 4), //attento, date undefined
+          year: checkDate ? checkDate.substring(0, 4) : "n.d.", 
           category: searchingFor.toUpperCase()
         };
         targetBox.append(template(context));
@@ -109,23 +113,21 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
 
       if (callType === "search") {
         searchResultsBox.find('.media').each(function() {
-          console.log(bookmarked, $(this).data('id'), bookmarked.includes($(this).data('id')))
             if ( bookmarked.includes($(this).data('id'))) {
                 $(this).find('.fa-bookmark').addClass('active');
             }
         });
       }
-      if (data.total_pages > data.page && data.page < 10) {
+      if (data.total_pages > data.page && data.page <= 5) {
         queryData.page++;
         getMedia(callType, searchingFor, queryData, targetBox);
       } 
-      if (data.page == 9) {
+      if (data.page == 5) {
         decodeGenres(targetBox, searchingFor);
       }
     },
     error: function (request, state, errors) {
-      alert(errors);
-    }
+      console.log(errors);    }
   });
 }
 
@@ -153,7 +155,6 @@ function getGenres() {
         api_key: key,
       },
       success: function (data) {
-        console.log("called ajax")
         var template = Handlebars.compile($('#template_genreFilter_options').html());
         var genresList = [];
         for (var entry of data.genres) {
@@ -168,7 +169,7 @@ function getGenres() {
         }
       },
       error: function (request, state, errors) {
-        alert(errors);
+        console.log(errors);
       }
     });
   }
@@ -183,20 +184,22 @@ function decodeGenres(targetBox, type) {
       },
       success: function (data) {
         targetBox.find('.media').each(function() {
-        var mediaCodes = $(this).data('genre').split(',');
+        var mediaCodes = $(this).data('genre');
+        mediaCodes = (typeof mediaCodes === "string") ? mediaCodes.split(",") : [mediaCodes];
         var genresList = "";
-          for (var entry of data.genres){
-            for(var mediaCode of mediaCodes){
+          for (var mediaCode of mediaCodes){
+            for (var entry of data.genres){ 
             if (mediaCode == entry.id) {
               genresList += "\n" + entry.name;
             }
            }
           }
+          genresList = (genresList.length > 0) ? genresList : "\nn.d.";
           $(this).find('.genre').html("<span>Genere:</span><span>" + genresList + "</span>");
       });
       },
       error: function (request, state, errors) {
-        alert(errors);
+        console.log(errors);
       }
     });
 }
@@ -251,10 +254,10 @@ function filterForGenre() {
 }
 
 function init() {
-
   initVars();
   location.hash = "#latest"; //indirizza la view su #latest
-
+  $(document).keypress(function(e) { if(e.which == 13) e.preventDefault() }); //previene refresh su tasto enter
+ 
   //chiamate API di default
   getGenres();
   getMedia("discover", "movie", {
@@ -282,7 +285,21 @@ function init() {
   headbarNavigationButtons.click(headbarNavigation);
   mediaBox.scroll(scrollbarHeadbarSync);
 
-  //ricerca manuale
+  //ricerca 
+  searchInput.on({
+    focusin: function() {
+      searchInput.find('input').val("");
+    },
+    focusout: function() {
+      setTimeout(function() {searchInput.find('input').val("Cerca un film o una serie-tv...")}, 100);
+    },
+    keypress: function(e) { 
+      if (e.which == 13) {
+      searchForMedia();
+      searchInput.blur();
+      }
+    }
+  });
   searchButton.click(searchForMedia);
 
   //filtro per generi

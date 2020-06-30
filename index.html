@@ -14,9 +14,9 @@
   </head>
   <body>
       <div class="headbar">
-          <h2 id="logo">BOOLFLIX</h2>
+          <h2 id="logo">NOTFLIX</h2>
         <ul>
-          <li><a href="#latest">POPULAR</a></li>
+          <li><a href="#latest">LATEST</a></li>
           <li><a href="#movies">MOVIES</a></li>
           <li><a href="#tv-series">TV-SERIES</a></li>
           <li><a href="#favourites">FAVOURITES</a></li>
@@ -29,7 +29,7 @@
           </li>
         </ul>
         <form class="">
-          <input type="text" name="search" value="">
+          <input type="text" name="search" value="Cerca un film o una serie-tv...">
           <i class="fas fa-search go"></i>
         </form>
       </div>
@@ -49,7 +49,7 @@
         </div>
         <h2>FAVOURITES</h2>
         <div id="favourites">
-  
+          
         </div>
         <h2>SEARCH</h2>
         <div id="search">
@@ -58,7 +58,12 @@
       </div>
   
       <footer>
-        <h6>BOOLFLIX&copy;</h6>
+        <h6>
+          <a id="myPortfolio" href="https://albertocapone.github.io/">
+            Alberto Capone - Junior Full Stack Dveeloper - Portfolio
+          </a>
+        </h6>
+        <h6>NOTFLIX&copy;</h6>
       </footer>
 
     <script id="template_media" type="text/x-handlebars-template">
@@ -94,7 +99,7 @@
           </div>
           <p class="overview">
             <span>
-              OVERVIEW
+              Overview
             </span>
             <span>
               {{overview}}
