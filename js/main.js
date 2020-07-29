@@ -258,7 +258,6 @@ function filterForGenre() {
 function init() {
   initVars();
   location.hash = "#latest"; //indirizza la view su #latest
-  $(document).keypress(function(e) { if(e.which == 13) e.preventDefault() }); //previene refresh su tasto enter
  
   //chiamate API di default
   getGenres();
@@ -295,10 +294,11 @@ function init() {
     focusout: function() {
       setTimeout(function() {searchInput.find('input').val("Cerca un film o una serie-tv...")}, 100);
     },
-    keypress: function(e) { 
+    keydown: function(e) { 
       if (e.which == 13) {
+      e.preventDefault();
+      document.getElementById('searchInput').blur();
       searchForMedia();
-      searchInput.blur();
       }
     }
   });
