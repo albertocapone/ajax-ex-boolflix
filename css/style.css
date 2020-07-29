@@ -271,6 +271,7 @@ img.flags {
 
 .addTo {
   align-self: flex-end;
+  font-size: 15px;
 }
 
 .fa-bookmark:hover {

@@ -145,6 +145,7 @@ function searchForMedia() {
     query: $('input').val(),
     page: 1
   }, searchResultsBox);
+  location.hash = "";
   location.hash = "#search";
 }
 
