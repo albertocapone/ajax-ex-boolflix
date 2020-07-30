@@ -14,10 +14,10 @@ function initVars() {
    headbarNavigationButtons = $('.headbar a');
    genresButton = $('#genre_button');
    searchButton = $('.go');
-   //form
+  //form
    searchInput = $('.headbar > form');
   //preferiti
-   bookmarked = [];
+   bookmarked = cookie.get('favourites') ? cookie.get('favourites').split(',') : [];
 }
 
 function headbarNavigation() {
@@ -29,7 +29,7 @@ function headbarNavigation() {
 
 function scrollbarHeadbarSync() {
    var at = mediaBox.scrollTop();
-   console.log(at)
+  //  console.log(at)
    headbarNavigationButtons.each(function () {
      $(this).removeClass('active');
    });
@@ -113,13 +113,13 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
         targetBox.append(template(context));
       }
 
-      if (callType === "search") {
-        searchResultsBox.find('.media').each(function() {
-            if ( bookmarked.includes($(this).data('id'))) {
-                $(this).find('.fa-bookmark').addClass('active');
-            }
-        });
-      }
+      targetBox.find('.media').each(function() {
+        if (bookmarked.includes(String($(this).data('id'))) && !$(this).find('.fa-bookmark').hasClass('active')) {
+          $(this).find('.fa-bookmark').addClass('active');
+          favouritesBox.append($(this).clone());
+        }
+      });
+      
       if (data.total_pages > data.page && data.page <= 5) {
         queryData.page++;
         getMedia(callType, searchingFor, queryData, targetBox);
@@ -213,6 +213,7 @@ function manageFavourites() {
   if (!$(this).hasClass('active')) {
     var idMedia = $(this).parents('.media').data('id');
     bookmarked.push(idMedia);
+    cookie.set('favourites', bookmarked);
     favouritesBox.append($(this).parents('.media').clone());
     $('.media').each(function () {
       if ($(this).data('id') === idMedia)
@@ -228,7 +229,8 @@ function manageFavourites() {
        if ($(this).data('id') === idMedia)
         $(this).remove();
     });
-    bookmarked = bookmarked.filter((id) => id !== idMedia);
+    bookmarked = bookmarked.filter((id) => id != idMedia);
+    cookie.set('favourites', bookmarked);
   }
 }
 
@@ -259,6 +261,10 @@ function filterForGenre() {
 function init() {
   initVars();
   location.hash = "#latest"; //indirizza la view su #latest
+
+  if (cookie.enabled()) {
+    cookie.defaults.expires = 365;
+  }
  
   //chiamate API di default
   getGenres();

@@ -124,6 +124,7 @@ i.go {
   transform: translateY(-50%);
   color: rgba(255, 8, 0, 1);
   cursor: pointer;
+  font-size: 18px;
 }
 
 .media_box {
