@@ -137,6 +137,8 @@ i.go {
   background-image: linear-gradient(-120deg, #0e0e0e, #272222);
   display: flex;
   flex-direction: column;
+  scrollbar-color: rgba(255, 8, 0, 1) rgba(0, 0, 0, 0.9);
+  scrollbar-width: thin;
 }
 
 .media_box>*:not(h2) {
@@ -146,6 +148,7 @@ i.go {
   display: flex;
   align-items: stretch;
   overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .media_box>h2 {
