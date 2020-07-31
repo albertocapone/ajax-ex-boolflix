@@ -169,7 +169,7 @@ i.go {
   max-width: calc(100% / 3 - 10px);
   margin: 5px 5px;
   border-radius: 5px;
-  transition: all .4s ease-in;
+  transition: all .4s ease-out;
 }
 
 .media:hover > .media_info {
@@ -237,6 +237,7 @@ i.go {
   padding: 10px 0;
   flex-basis: 50%;
   overflow-y: scroll;
+  scrollbar-width: thin;
 }
 
 .score{
@@ -377,7 +378,7 @@ footer h6 {
   }
 
   .headbar > form {
-    flex-basis: 165px;
+    flex-basis: 175px;
   }
 
   .media_box>*:not(h2) {
