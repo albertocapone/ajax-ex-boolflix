@@ -141,7 +141,7 @@ i.go {
 
 .media_box>*:not(h2) {
   width: 100%;
-  min-height: 85%;
+  min-height: 360px;
   margin-top: 20px;
   display: flex;
   align-items: stretch;
@@ -163,6 +163,7 @@ i.go {
 .media {
   position: relative;
   min-width: calc(100% / 3 - 10px);
+  max-width: calc(100% / 3 - 10px);
   margin: 5px 5px;
   border-radius: 5px;
   transition: all .3s ease-out;
@@ -339,7 +340,7 @@ footer h6 {
   }
 
   .media_box>*:not(h2) {
-    min-height: 55%;
+    min-height: 300px;
   }
 
   .media {
@@ -366,7 +367,7 @@ footer h6 {
   }
 
   .media_box>*:not(h2) {
-    min-height: 50%;
+    min-height: 280px;
   }
 
   .media_info {
