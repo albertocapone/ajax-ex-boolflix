@@ -29,7 +29,6 @@ function headbarNavigation() {
 
 function scrollbarHeadbarSync() {
    var at = mediaBox.scrollTop();
-  //  console.log(at)
    headbarNavigationButtons.each(function () {
      $(this).removeClass('active');
    });
@@ -94,7 +93,6 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
       var template = Handlebars.compile($('#template_media').html());
       var results = data.results; 
       results = results.filter((elm) => elm.poster_path && elm.overview.length > 25 && elm.id != 10784);
-
       for (var media of results) { 
         var checkDate = (searchingFor == "tv") ? media.first_air_date : media.release_date;
         var context = { 
@@ -112,19 +110,17 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
         };
         targetBox.append(template(context));
       }
-
-      targetBox.find('.media').each(function() {
-        if (bookmarked.includes(String($(this).data('id'))) && !$(this).find('.fa-bookmark').hasClass('active')) {
-          $(this).find('.fa-bookmark').addClass('active');
-          favouritesBox.append($(this).clone());
-        }
-      });
-      
-      if (data.total_pages > data.page && data.page <= 5) {
+      if (data.total_pages > data.page && targetBox.find('.media').length <= 100) {
         queryData.page++;
         getMedia(callType, searchingFor, queryData, targetBox);
       } 
-      if (data.page == 5) {
+      else {
+        targetBox.find('.media').each(function() {
+          if (bookmarked.includes(String($(this).data('id'))) && !$(this).find('.fa-bookmark').hasClass('active')) {
+            $(this).find('.fa-bookmark').addClass('active');
+            favouritesBox.append($(this).clone());
+          }
+        });
         decodeGenres(targetBox, searchingFor);
       }
     },
@@ -150,7 +146,7 @@ function searchForMedia() {
 }
 
 function getGenres() {
-  for (var its = 0, type = "movie"; its < 2; its++, type = "tv") {
+  for (let its = 0, type = "movie"; its < 2; its++, type = "tv") {
     $.ajax({
       url: "https://api.themoviedb.org/3/genre/" + type + "/list?", 
       method: "GET",
@@ -178,38 +174,26 @@ function getGenres() {
   }
 }
 
-function decodeGenres(targetBox, type) {
-    $.ajax({
-      url: "https://api.themoviedb.org/3/genre/" + type + "/list?",
-      method: "GET",
-      data: {
-        api_key: key,
-      },
-      success: function (data) {
-        targetBox.find('.media').each(function() {
-        var mediaCodes = $(this).data('genre');
-        mediaCodes = (typeof mediaCodes === "string") ? mediaCodes.split(",") : [mediaCodes];
-        var genresList = "";
-          for (var mediaCode of mediaCodes){
-            for (var entry of data.genres){ 
-            if (mediaCode == entry.id) {
-              genresList += "\n" + entry.name;
-            }
-           }
-          }
-          genresList = (genresList.length > 0) ? genresList : "\nn.d.";
-          $(this).find('.genre').html("<span>Genere:</span><span>" + genresList + "</span>");
+function decodeGenres(targetBox) {
+  targetBox.find('.media').each(function () {
+    var media = $(this);
+    var mediaCodes = $(this).data('genre');
+    mediaCodes = (typeof mediaCodes === "string") ? mediaCodes.split(",") : [mediaCodes];
+    var genresList = [];
+    for (var code of mediaCodes) {
+      $('#genres_list option').each(function() {
+        if(code == $(this).val()){
+          genresList.push($(this).html());
+        }
       });
-      },
-      error: function (request, state, errors) {
-        console.log(errors);
-      }
-    });
+    }
+    genresList = (genresList.length > 0) ? [...new Set(genresList)].join(', ') : "n.d.";
+    media.find('.genre').html("<span>Genere: </span><span>" + genresList + "</span>");
+  });
 }
 
 
 function manageFavourites() {
-
   if (!$(this).hasClass('active')) {
     var idMedia = $(this).parents('.media').data('id');
     bookmarked.push(idMedia);
