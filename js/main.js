@@ -5,7 +5,6 @@ function initVars() {
    key = "99778220f31eec4fabbbe1461237e9d0";
   //contenitori
    mediaBox = $('.media_box');
-   latestBox = $('#latest');
    moviesBox = $('#movies');
    seriesBox = $('#tv-series');
    searchResultsBox = $('#search');
@@ -38,11 +37,9 @@ function scrollbarHeadbarSync() {
      headbarNavigationButtons.eq(1).addClass('active');
    } else if (at >= 732 && at <= 1100) {
      headbarNavigationButtons.eq(2).addClass('active');
-   } else if (at >= 1101 && at <= 1533) {
-     headbarNavigationButtons.eq(3).addClass('active');
    } else {
-     headbarNavigationButtons.eq(4).addClass('active');
-   }
+     headbarNavigationButtons.eq(3).addClass('active');
+   } 
 }
 
 function displayLanguage(language, mode) { 
@@ -81,7 +78,7 @@ function rateIt(vote) {
 }
 
 function displayCover(coverPath) {
-  return (coverPath) ? "https://image.tmdb.org/t/p/" + "/w342/" + coverPath : "img/not-available.gif";
+  return (coverPath) ? "https://image.tmdb.org/t/p/" + "/w500/" + coverPath : "img/not-available.gif";
 }
 
 function getMedia(callType, searchingFor, queryData, targetBox) {
@@ -244,7 +241,7 @@ function filterForGenre() {
 
 function init() {
   initVars();
-  location.hash = "#latest"; //indirizza la view su #latest
+  document.getElementById('scrollable').scrollTo(0, 0);
 
   if (cookie.enabled()) {
     cookie.defaults.expires = 365;
@@ -252,16 +249,6 @@ function init() {
  
   //chiamate API di default
   getGenres();
-  getMedia("discover", "movie", {
-    api_key: key,
-    sort_by: "release_date.desc",
-    page: 1
-  }, latestBox);
-  getMedia("discover", "tv", {
-    api_key: key,
-    sort_by: "release_date.desc",
-    page: 1
-  }, latestBox);
   getMedia("discover", "movie", {
     api_key: key,
     sort_by: "popularity.desc",
