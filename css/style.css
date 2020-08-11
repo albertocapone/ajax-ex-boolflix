@@ -370,7 +370,7 @@ footer h6 {
   }
 
   .headbar {
-    padding: 7px;
+    padding: 7px 15px;
   }
 
   .headbar #logo {
@@ -382,7 +382,7 @@ footer h6 {
   }
 
   .headbar > form {
-    flex-basis: 182px;
+    flex-basis: 170px;
   }
 
   .headbar input {
