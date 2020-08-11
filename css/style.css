@@ -143,7 +143,7 @@ i.go {
 .media_box>*:not(h2) {
   width: 100%;
   min-height: 360px;
-  padding-bottom: 10px;
+  padding: 10px;
   margin-top: 20px;
   display: flex;
   align-items: stretch;
@@ -369,6 +369,10 @@ footer h6 {
     font-size: 10px;
   }
 
+  .headbar {
+    padding: 7px;
+  }
+
   .headbar #logo {
     font-size: 30px;
   }
@@ -379,6 +383,10 @@ footer h6 {
 
   .headbar > form {
     flex-basis: 182px;
+  }
+
+  .headbar input {
+    font-size: 9px;
   }
 
   .media_box>*:not(h2) {

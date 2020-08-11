@@ -113,9 +113,12 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
       } 
       else {
         targetBox.find('.media').each(function() {
-          if (bookmarked.includes(String($(this).data('id'))) && !$(this).find('.fa-bookmark').hasClass('active')) {
+          console.log(bookmarked, String($(this).data('id')), bookmarked.includes(String($(this).data('id'))) );
+          if (bookmarked.includes($(this).data('id')) && !$(this).find('.fa-bookmark').hasClass('active')) {
             $(this).find('.fa-bookmark').addClass('active');
-            favouritesBox.append($(this).clone());
+            if (callType != 'search') {
+              favouritesBox.append($(this).clone());
+            }
           }
         });
         decodeGenres(targetBox, searchingFor);
