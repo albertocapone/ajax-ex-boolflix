@@ -16,8 +16,7 @@ function initVars() {
   //form
    searchInput = $('.headbar > form');
   //preferiti
-   bookmarked = cookie.get('favourites') ? cookie.get('favourites').split(',') : [];
-   console.log(bookmarked, typeof bookmarked)
+   bookmarked = cookie.get('favourites') ? cookie.get('favourites').split(',').map((i) => Number(i)) : [];
 }
 
 function headbarNavigation() {
@@ -116,9 +115,7 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
         targetBox.find('.media').each(function() {
           if (bookmarked.includes($(this).data('id')) && !$(this).find('.fa-bookmark').hasClass('active')) {
             $(this).find('.fa-bookmark').addClass('active');
-            console.log('preferitox')
             if (callType == 'discover') {
-              console.log('callType')
               favouritesBox.append($(this).clone());
             }
           }
@@ -200,7 +197,6 @@ function manageFavourites() {
     var idMedia = $(this).parents('.media').data('id');
     bookmarked.push(idMedia);
     cookie.set('favourites', bookmarked);
-    console.log(cookie.get('favourites'))
     favouritesBox.append($(this).parents('.media').clone());
     $('.media').each(function () {
       if ($(this).data('id') === idMedia)
@@ -249,9 +245,9 @@ function init() {
   initVars();
   document.getElementById('scrollable').scrollTo(0, 0);
 
-  // if (cookie.enabled()) {
-  //   cookie.defaults.expires = 365;
-  // }
+  if (cookie.enabled()) {
+    cookie.defaults.expires = 365;
+  }
  
   //chiamate API di default
   getGenres();
