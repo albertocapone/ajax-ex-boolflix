@@ -17,7 +17,7 @@ function initVars() {
    searchInput = $('.headbar > form');
   //preferiti
    bookmarked = cookie.get('favourites') ? cookie.get('favourites').split(',') : [];
-   console.log(cookie.get('favourites'))
+   console.log(bookmarked, typeof bookmarked)
 }
 
 function headbarNavigation() {
@@ -116,7 +116,9 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
         targetBox.find('.media').each(function() {
           if (bookmarked.includes($(this).data('id')) && !$(this).find('.fa-bookmark').hasClass('active')) {
             $(this).find('.fa-bookmark').addClass('active');
+            console.log('preferitox')
             if (callType == 'discover') {
+              console.log('callType')
               favouritesBox.append($(this).clone());
             }
           }
