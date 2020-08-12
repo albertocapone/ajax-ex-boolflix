@@ -201,10 +201,6 @@ button:focus {
   justify-content: flex-start;
 }
 
-.media_info > * {
-  flex: 0 1;
-}
-
 .title {
   color: rgba(255, 8, 0, 1);
   flex: 0 1.5;
