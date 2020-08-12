@@ -128,8 +128,9 @@ button:focus {
   transform: translateY(-50%);
   color: rgba(255, 8, 0, 1);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   border: none;
+  background-color: white;
 }
 
 .media_box {
@@ -394,7 +395,7 @@ footer h6 {
   }
 
   .headbar input {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .media_box>*:not(h2) {
