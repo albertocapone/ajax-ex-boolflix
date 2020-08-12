@@ -12,7 +12,7 @@ function initVars() {
   //bottoni
    headbarNavigationButtons = $('.headbar a');
    genresButton = $('#genre_button');
-   searchButton = $('.go');
+   searchButton = $('#go');
   //form
    searchInput = $('.headbar > form');
   //preferiti
@@ -33,9 +33,9 @@ function scrollbarHeadbarSync() {
    });
    if (at <= 330) {
      headbarNavigationButtons.eq(0).addClass('active');
-   } else if (at >= 331 && at <= 731) {
+   } else if (at >= 331 && at <= 700) {
      headbarNavigationButtons.eq(1).addClass('active');
-   } else if (at >= 732 && at <= 1100) {
+   } else if (at >= 701 && at <= 1060) {
      headbarNavigationButtons.eq(2).addClass('active');
    } else {
      headbarNavigationButtons.eq(3).addClass('active');
@@ -113,8 +113,8 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
       } 
       else {
         targetBox.find('.media').each(function() {
-          if (bookmarked.includes($(this).data('id')) && !$(this).find('.fa-bookmark').hasClass('active')) {
-            $(this).find('.fa-bookmark').addClass('active');
+          if (bookmarked.includes($(this).data('id')) && !$(this).find('.bookmark').hasClass('active')) {
+            $(this).find('.bookmark').addClass('active');
             if (callType == 'discover') {
               favouritesBox.append($(this).clone());
             }
@@ -200,13 +200,13 @@ function manageFavourites() {
     favouritesBox.append($(this).parents('.media').clone());
     $('.media').each(function () {
       if ($(this).data('id') === idMedia)
-        $(this).find('.fa-bookmark').addClass('active');
+        $(this).find('.bookmark').addClass('active');
     });
   } else {
     var idMedia = $(this).parents('.media').data('id');
     $('.media').each(function () {
       if ($(this).data('id') === idMedia)
-        $(this).find('.fa-bookmark').removeClass('active');
+        $(this).find('.bookmark').removeClass('active');
     });
     favouritesBox.children().each(function () {
        if ($(this).data('id') === idMedia)
@@ -288,7 +288,7 @@ function init() {
   genresButton.click(filterForGenre);
 
   //aggiungi a preferiti
-  mediaBox.on("click", ".fa-bookmark", manageFavourites);
+  mediaBox.on("click", ".bookmark", manageFavourites);
 }
 
 $(document).ready(init);

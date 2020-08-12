@@ -16,6 +16,10 @@ body {
   padding-top: 75px;
 }
 
+button:focus {
+  outline: 0;
+}
+
 
 /* scrollbar */
 ::-webkit-scrollbar {
@@ -117,7 +121,7 @@ body {
   box-shadow: 0 0 10px #719ECE;
 }
 
-i.go {
+#go {
   position: absolute;
   top: 50%;
   right: 5px;
@@ -125,6 +129,7 @@ i.go {
   color: rgba(255, 8, 0, 1);
   cursor: pointer;
   font-size: 18px;
+  border: none;
 }
 
 .media_box {
@@ -288,16 +293,19 @@ img.flags {
   color: rgba(255, 8, 0, 1);
 }
 
-.addTo {
+.bookmark {
   align-self: flex-end;
-  font-size: 15px;
+  font-size: 16px;
+  background-color: black;
+  color: white;
+  border: none;
 }
 
-.fa-bookmark:hover {
+.bookmark:hover {
   cursor: pointer;
 }
 
-.fa-bookmark.active {
+.bookmark.active {
   color: red;
 }
 
