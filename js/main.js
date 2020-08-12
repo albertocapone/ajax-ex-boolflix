@@ -14,7 +14,7 @@ function initVars() {
    genresButton = $('#genre_button');
    searchButton = $('#go');
   //form
-   searchInput = $('.headbar > form');
+   searchInput = $('#searchInput');
   //preferiti
    bookmarked = cookie.get('favourites') ? cookie.get('favourites').split(',').map((i) => Number(i)) : [];
 }
@@ -129,15 +129,17 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
 }
 
 function searchForMedia() {
+  var input = $('#searchInput').val();
+  console.log(input);
   searchResultsBox.html("");
   getMedia("search", "movie", {
     api_key: key,
-    query: $('input').val(), 
+    query: input, 
     page: 1
   }, searchResultsBox);
   getMedia("search", "tv", {
     api_key: key,
-    query: $('input').val(),
+    query: input,
     page: 1
   }, searchResultsBox);
   location.hash = "";
@@ -269,10 +271,10 @@ function init() {
   //ricerca 
   searchInput.on({
     focusin: function() {
-      searchInput.find('input').val("");
+      searchInput.val("");
     },
     focusout: function() {
-      setTimeout(function() {searchInput.find('input').val("Cerca un film o una serie-tv...")}, 100);
+      setTimeout(function() {searchInput.val("Cerca un film o una serie-tv...")}, 100);
     },
     keydown: function(e) { 
       if (e.which == 13) {
