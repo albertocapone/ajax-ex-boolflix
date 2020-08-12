@@ -16,10 +16,13 @@ body {
   padding-top: 75px;
 }
 
+button {
+  -webkit-appearance: none;
+}
+
 button:focus {
   outline: 0;
 }
-
 
 /* scrollbar */
 ::-webkit-scrollbar {
