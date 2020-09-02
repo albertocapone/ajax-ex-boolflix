@@ -129,6 +129,12 @@ function getMedia(callType, searchingFor, queryData, targetBox) {
 }
 
 function searchForMedia() {
+  //azzeramento selezione generi
+   $(".media").each(function () {
+     $(this).show();
+   });
+   $("#genres_list").val('all');
+  //
   var input = $('#searchInput').val();
   console.log(input);
   searchResultsBox.html("");
