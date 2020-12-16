@@ -78,7 +78,7 @@ button:focus {
   transform: translateY(25%);
 }
 
-.headbar>ul {
+.headbar_nav {
   list-style-type: none;
   flex: 0 1 390px;
   font-size: 12px;
@@ -88,14 +88,14 @@ button:focus {
   color: rgba(255, 8, 0, 1);
 }
 
-.headbar a, .headbar span {
+.headbar_nav a, .headbar_nav span {
   transition: all .4s ease-out;
 }
 
-.headbar a:hover,
-.headbar a.active,
-.headbar span:hover,
-.headbar span.active {
+.headbar_nav a:hover,
+.headbar_nav a.active,
+.headbar_nav span:hover,
+.headbar_nav span.active {
   text-shadow: 0 0 .1em, 0 0 .3em;
   letter-spacing: 1.5px;
   cursor: pointer;
@@ -140,7 +140,7 @@ button:focus {
   position: relative;
   width: 100%;
   height: calc(100% - 35px);
-  padding: 0 20px 20px;
+  padding: 10px 20px 20px;
   overflow-y: auto;
   background-image: linear-gradient(-120deg, #0e0e0e, #272222);
   display: flex;
@@ -149,18 +149,13 @@ button:focus {
   scrollbar-width: thin;
 }
 
-.media_box>*:not(h2) {
-  width: 100%;
-  min-height: 360px;
-  padding: 10px;
-  margin-top: 20px;
+.media_box > .container {
   display: flex;
-  align-items: stretch;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  flex-direction: column;
+  position: relative;
 }
 
-.media_box>h2 {
+.media_box > .container > h2 {
   width: 100%;
   margin-top: 30px;
   font-size: 25px;
@@ -170,6 +165,46 @@ button:focus {
   1px 3px hsl(0, 0%, 75%),
   1px 4px 20px rgba(255, 0, 0, 0.9);
   letter-spacing: 4px;
+}
+
+#movies, 
+#tv-series, 
+#favourites, 
+#search {
+  width: 100%;
+  min-height: 360px;
+  padding: 10px;
+  margin-top: 20px;
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.page_switchers {
+  position: absolute;
+  top: 32px;
+  right: 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100px;
+}
+
+.page_switchers button {
+  font-size: 23px;
+  cursor: pointer;
+  border: none;
+  color: rgba(255, 8, 0, 1);
+  text-shadow: 1px 1px hsl(0, 0%, 85%), 1px 2px hsl(0, 0%, 80%), 1px 3px hsl(0, 0%, 75%), 1px 4px 20px rgba(255, 0, 0, 0.9);
+  background-color: inherit;
+}
+
+.page_index {
+  font-size: 17px;
+  color: rgba(255, 8, 0, 1);
+  text-shadow: 1px 1px hsl(0, 0%, 85%), 1px 2px hsl(0, 0%, 80%), 1px 3px hsl(0, 0%, 75%), 1px 4px 20px rgba(255, 0, 0, 0.9);
 }
 
 .media {
@@ -362,7 +397,10 @@ footer h6 {
     display: none;
   }
 
-  .media_box>*:not(h2) {
+  #movies, 
+  #tv-series, 
+  #favourites, 
+  #search {
     min-height: 300px;
   }
 
@@ -397,7 +435,10 @@ footer h6 {
     font-size: 8px;
   }
 
-  .media_box>*:not(h2) {
+  #movies, 
+  #tv-series, 
+  #favourites, 
+  #search {
     min-height: 280px;
   }
 

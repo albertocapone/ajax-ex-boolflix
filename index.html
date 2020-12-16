@@ -7,16 +7,15 @@
     <script src="https://kit.fontawesome.com/f5e66b81f3.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="js/cookie.umd.min.js"></script>     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>     
     <script src="js/circletype.min.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
     <title></title>
   </head>
   <body>
       <div class="headbar">
           <h2 id="logo">BOOLFLIX</h2>
-        <ul>
+        <ul class="headbar_nav">
           <li><a href="#movies">MOVIES</a></li>
           <li><a href="#tv-series">TV-SERIES</a></li>
           <li><a href="#favourites">FAVOURITES</a></li>
@@ -37,30 +36,82 @@
       </div>
   
       <div id="scrollable" class="media_box">
-        <h2>MOVIES</h2>
-        <div id="movies">
-  
+
+        <div class="container">
+          <h2>MOVIES</h2>
+          <div class="page_switchers" data-box="movies">
+            <div class="page_index">
+
+            </div>
+            <button class="page-down">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-up">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div id="movies">
+            
+          </div>
         </div>
-        <h2>TV-SERIES</h2>
-        <div id="tv-series">
-  
+
+        <div class="container">
+          <h2>TV-SERIES</h2>
+          <div class="page_switchers" data-box="series">
+            <div class="page_index">
+
+            </div>
+            <button class="page-down">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-up">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div id="tv-series">
+             
+          </div>
         </div>
-        <h2>FAVOURITES</h2>
-        <div id="favourites">
-          
+
+        <div class="container">
+          <h2>FAVOURITES</h2>
+          <div class="page_switchers" data-box="favs">
+            <div class="page_index">
+
+            </div>
+           <button class="page-down">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-up">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div id="favourites">
+             
+          </div>
         </div>
-        <h2>SEARCH</h2>
-        <div id="search">
-  
+
+        <div class="container">
+          <h2>SEARCH</h2>
+          <div class="page_switchers" data-box="search">
+            <div class="page_index">
+
+            </div>
+           <button class="page-down">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-up">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div id="search">
+             
+          </div>
         </div>
+
       </div>
   
       <footer>
-        <!-- <h6>
-          <a id="myPortfolio" href="https://albertocapone.github.io/">
-            Alberto Capone - Jr Full Stack Developer - Portfolio
-          </a>
-        </h6> -->
         <h6>BOOLFLIX&copy;</h6>
       </footer>
 
@@ -93,7 +144,8 @@
             {{language}}
           </div>
           <div class="genre">
-
+            <span>Genere: </span>
+            <span>{{genres}}</span>
           </div>
           <p class="overview">
             <span>
@@ -121,7 +173,6 @@
     <script id="template_genreFilter_options" type="text/x-handlebars-template">
       <option value={{genreCode}}>{{genreName}}</option>
     </script>
-
 
   </body>
 
