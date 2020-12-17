@@ -6,7 +6,7 @@ function initVars() { //le variabili vengono dichiarate senza keyword in modo ch
   keyAPI = "99778220f31eec4fabbbe1461237e9d0";
 
   //contenitori
-  mediaBox = $(".media_box");
+  mediaBox = $("#media_box");
   moviesBox = $("#movies");
   seriesBox = $("#tv-series");
   searchResultsBox = $("#search");
@@ -104,16 +104,14 @@ const displayLanguage = (language, mode) => {
 
 const rateIt = (vote) => {
 
-  var starString = "";
-  var starredVote = (vote == 0) ? 1 : Math.round(vote / 2);
+  const starredVote = (vote == 0) ? 1 : Math.round(vote / 2);
+  let starString = "";
 
-  for (var stars = 0; stars < 5; stars++) {
+  for (let stars = 0; stars < 5; stars++) {
 
-    if (stars < starredVote) {
-      starString += "<i class='fas fa-star'></i>";
-    } else {
-      starString += "<i class='far fa-star'></i>";
-    }
+    if (stars < starredVote)  starString += "<i class='fas fa-star'></i>";
+    else  starString += "<i class='far fa-star'></i>";
+  
   }
   return starString;
 
@@ -127,7 +125,6 @@ const displayCover = (coverPath) => {
 const translateGenres = (mediaGenreCodes = []) => {
   
   const genresTable = state.genres;
-
   let genresList = [];
 
   for(let e = 0; e < mediaGenreCodes.length; e++) {
@@ -185,14 +182,13 @@ async function search(e, page = 1) {
 
   if (!searchInput.val().trim().length) return;
 
-    const ajaxObject = {
-      ...ajaxDefaults,
-    };
+  const ajaxObject = {
+    ...ajaxDefaults,
+  };
   ajaxObject.data.page = page;
   ajaxObject.data.query = state.search.query ?? searchInput.val();
 
   const url = ajaxObject.url;
-
   let data;
 
   ajaxObject.url = `${url}search/movie`;
@@ -252,7 +248,9 @@ const mediaTemplating = (data, targetBox) => {
   targetBox.html("");
 
   for (const media of data) {
+
     const checkDate = media.first_air_date ?? media.release_date;
+    
     const context = {
       id: media.id,
       cover: displayCover(media.poster_path),
@@ -266,6 +264,7 @@ const mediaTemplating = (data, targetBox) => {
       genres: translateGenres(media.genre_ids),
       year: checkDate ? checkDate.substring(0, 4) : "n.d.",
     };
+
     targetBox.append(template(context));
   }
 
@@ -277,13 +276,14 @@ const genresTemplating = () => {
 
   for (const genre of state.genres) {
 
-     var context = {
+     const context = {
        genreName: genre.name,
        genreCode: genre.id,
      };
 
      genresFilterBox.append(template(context));
   }
+
 }
 
 const updateDOM = (prop) => {
@@ -305,6 +305,7 @@ const updateDOM = (prop) => {
       mediaTemplating(state.search.data, searchResultsBox);
       showPagesIndex(prop);
       checkForFavs(searchResultsBox);
+      mediaBox.scrollTop(1800);
       break;
 
     case "favs":
@@ -325,28 +326,28 @@ const updateDOM = (prop) => {
 /* Favourites */
 const getFavsFromStorage = (page = 1) => {
    
-  const favourites = window.localStorage.getItem("favourites") ? JSON.parse(window.localStorage.getItem("favourites")) : [];
-  const resultsPerPage = 20;
-  const totalPages = Math.ceil(favourites.length / resultsPerPage);
-  const first = (page - 1) * resultsPerPage;
-  const last = first + resultsPerPage;
+  const favourites = window.localStorage.getItem("favourites") ? JSON.parse(window.localStorage.getItem("favourites")) : [],
+        resultsPerPage = 20,
+        totalPages = Math.ceil(favourites.length / resultsPerPage),
+        first = (page - 1) * resultsPerPage,
+        last = first + resultsPerPage;
 
-    state.favs = {
-      totalPages: totalPages || 1,
-      currentPage: page,
-      data: favourites,
-      onPage: favourites.slice(first, last)
-    };
+  state.favs = {
+    totalPages: totalPages || 1,
+    currentPage: page,
+    data: favourites,
+    onPage: favourites.slice(first, last)
+  };
     
 };
 
 const recalculateFavs = (favs) => {
 
-  const resultsPerPage = 20;
-  const totalPages = Math.ceil(favs.length / resultsPerPage);
-  const page = state.favs.currentPage;
-  const first = (page - 1) * resultsPerPage;
-  const last = first + resultsPerPage;
+  const resultsPerPage = 20,
+    totalPages = Math.ceil(favs.length / resultsPerPage),
+    page = (state.favs.currentPage <= totalPages) ? state.favs.currentPage : totalPages,
+    first = (page - 1) * resultsPerPage,
+    last = first + resultsPerPage;
 
   state.favs = {
     totalPages: totalPages || 1,
@@ -363,10 +364,11 @@ const saveFavsToStorage = () => {
 
 function add_n_remove_Favs() {
 
-  const bookmark = $(this);
-  const media = $(this).parents(".media");
-  const box = media.parent().siblings(".page_switchers").data("box");
-  const mediaID = media.data('id');
+  const bookmark = $(this),
+        media = $(this).parents(".media"),
+        mediaID = media.data('id'),
+        box = media.parent().siblings(".page_switchers").data("box");
+
   let updatedFavs;
 
   if( bookmark.hasClass("active") ) {
@@ -398,11 +400,11 @@ const checkForFavs = (box) => {
 /* Pagination */
 function page_switch() {
 
-  const box = $(this).parent().data("box");
-  const direction = $(this).attr("class");
-  const currentPage = state[box].currentPage;
-  const total_pages = state[box].totalPages;
-  const nextPage = (direction === 'page-up') ? currentPage + 1 : currentPage - 1;
+  const box = $(this).parent().data("box"),
+        direction = $(this).attr("class"),
+        currentPage = state[box].currentPage,
+        total_pages = state[box].totalPages,
+        nextPage = (direction === 'page-up') ? currentPage + 1 : currentPage - 1;
 
   if (direction === "page-up" && currentPage < total_pages || direction === "page-down" && currentPage > 1) {
 
@@ -429,9 +431,10 @@ function page_switch() {
 
 const showPagesIndex = (prop) => {
 
-  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } );
+  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } ),
+        pagesIndex = `<span>${state[prop].currentPage} - ${state[prop].totalPages}</span>`;
+        
   box.html("");
-  const pagesIndex = `<span>${state[prop].currentPage} - ${state[prop].totalPages}</span>`;
   box.append(pagesIndex);
 
 }
@@ -440,7 +443,7 @@ const showPagesIndex = (prop) => {
 /* Filters */
 function filterForGenre() {
 
-  var filter = $(this).val();
+  const filter = $(this).val();
 
   if (filter == "all") {
 
@@ -450,7 +453,7 @@ function filterForGenre() {
 
     $(".media").each(function () {
 
-      var mediaGenreCodes = $(this).data("genre");
+      let mediaGenreCodes = $(this).data("genre");
 
       mediaGenreCodes = typeof mediaGenreCodes === "string" ?
         mediaGenreCodes.split(",") 
@@ -467,9 +470,9 @@ function filterForGenre() {
 
 const resetfilters = () => {
 
-   $(".media").each(function () { $(this).show() } );
-   genresButton.removeClass("active");
-   genresFilterBox.hide();
+  $(".media").each(function () { $(this).show() } );
+  genresButton.removeClass("active");
+  genresFilterBox.hide();
 
 }
 /* -------- */
@@ -487,33 +490,26 @@ function headbarNavigation() {
 
 function scrollbarHeadbarSync() {
 
-   var at = mediaBox.scrollTop();
-  console.log(at);
-   headbarNavigationButtons.each(function () {
-     $(this).removeClass('active');
-   });
+  const at = mediaBox.scrollTop();
 
-   if (at <= 697) {
-     headbarNavigationButtons.eq(0).addClass('active');
-   } else if (at >= 698 && at <= 1305) {
-     headbarNavigationButtons.eq(1).addClass('active');
-   } else if (at >= 1306 && at <= 1747) {
-     headbarNavigationButtons.eq(2).addClass('active');
-   } else {
-     headbarNavigationButtons.eq(3).addClass('active');
-   } 
+  headbarNavigationButtons.each(function () {
+    $(this).removeClass('active');
+  });
 
+  if (at <= 697) headbarNavigationButtons.eq(0).addClass('active');
+  else if (at >= 698 && at <= 1305) headbarNavigationButtons.eq(1).addClass('active');
+  else if (at >= 1306 && at <= 1747) headbarNavigationButtons.eq(2).addClass('active');
+  else  headbarNavigationButtons.eq(3).addClass('active');
+  
 }
 /* ---------- */
 
 const setup = () => {
-  getGenres();
-  setTimeout(() => {
+  getGenres().then( () => {
     getFavsFromStorage();
     getMovies();
     getTVSeries();
-    document.getElementById("scrollable").scrollTo(0, 0);
-  }, 500);
+  });
 }
 
 /* App */
@@ -557,8 +553,7 @@ const Boolflix = () => {
   headbarNavigationButtons.click(headbarNavigation);
   mediaBox.scroll(scrollbarHeadbarSync);
  /* ------- */
-
+ 
 }
 /* --- */
-
 $(document).ready(Boolflix);
