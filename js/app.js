@@ -296,12 +296,14 @@ const updateDOM = (prop) => {
       injectTemplates("media", state.movies.data, moviesBox);
       paintPagesIndex(prop);
       paintBookmarks(moviesBox);
+      console.log({"movies": state.movies});
     break;
 
     case "series":
       injectTemplates("media", state.series.data, seriesBox);
       paintPagesIndex(prop);
       paintBookmarks(seriesBox);
+      console.log({"series": state.series});
     break;
 
     case "search":
@@ -309,16 +311,19 @@ const updateDOM = (prop) => {
       paintPagesIndex(prop);
       paintBookmarks(searchResultsBox);
       mediaBox.scrollTop(1800);
+      console.log({"search": state.search});
     break;
 
     case "favs":
       injectTemplates("media", state.favs.onPage, favouritesBox);
       paintPagesIndex(prop);
       paintBookmarks(favouritesBox); 
+      console.log({"favs": state.favs});
     break;
 
     case "genres":
       injectTemplates("genres", state.genres, genresFilterBox);
+      console.log({"genres": state.genres});
     break;
   }
 
@@ -435,7 +440,7 @@ function goToPage(e) {
   e.preventDefault();
 
   const box = $(this).parent().data("box"),
-        nextPage = $(this).find("input[name='page']").val();
+        nextPage = Number($(this).find("input[name='page']").val());
 
   switch (box) {
     case "movies":
