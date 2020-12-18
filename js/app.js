@@ -12,39 +12,39 @@ function initVars() { //le variabili vengono dichiarate senza keyword in modo ch
   searchResultsBox = $("#search");
   favouritesBox = $("#favourites");
   genresFilterBox = $("#genres_list");
+  pagination = $(".pagination");
 
   //bottoni
   headbarNavigationButtons = $(".headbar a");
   genresButton = $("#genre_button");
   searchButton = $("#go");
-  page_switchers = $(".page_switchers button");
-  page_index = $(".page_index");
-
-
+  page_switchers = $(".pagination button");
+  
   //form
   searchInput = $("#searchInput");
+  page_index = $(".page_index");
 
   //Application State 
   state = {
     movies: {
-      totalPages: null,
+      totalPages: 1,
       currentPage: 1,
       data: [],
     },
     series: {
-      totalPages: null,
+      totalPages: 1,
       currentPage: 1,
       data: [],
     },
     favs: {
-      totalPages: null,
+      totalPages: 1,
       currentPage: 1,
       data: [],
       onPage: []
     },
     search: {
       query: null,
-      totalPages: null,
+      totalPages: 1,
       currentPage: 1,
       data: [],
     },
@@ -53,9 +53,8 @@ function initVars() { //le variabili vengono dichiarate senza keyword in modo ch
 
   handlestate = {
     set: (target, prop, value) => {
-      if(prop === "favs") console.log('favs proxy');
-      resetfilters();
       target[prop] = value;
+      if(prop === "favs") saveFavsToStorage();
       updateDOM(prop);
       return true;
     }
@@ -241,83 +240,86 @@ async function getGenres() {
 /* ------------- */
 
 /* DOM Update */
-const mediaTemplating = (data, targetBox) => {
+const injectTemplates = (kind, data, targetBox) => {
 
-  const template = Handlebars.compile($("#template_media").html());
+  let template;
 
-  targetBox.html("");
+  switch (kind) {
+    case "media":
+      template = Handlebars.compile($("#template_media").html());
 
-  for (const media of data) {
+      targetBox.html("");
 
-    const checkDate = media.first_air_date ?? media.release_date;
-    
-    const context = {
-      id: media.id,
-      cover: displayCover(media.poster_path),
-      title: media.name ?? media.title,
-      originalTitle: media.original_name ?? media.original_title,
-      flag: displayLanguage(media.original_language, "img"),
-      language: displayLanguage(media.original_language, "txt"),
-      score: rateIt(media.vote_average),
-      overview: media.overview,
-      genreData: media.genre_ids,
-      genres: translateGenres(media.genre_ids),
-      year: checkDate ? checkDate.substring(0, 4) : "n.d.",
-    };
+      for (const media of data) {
+        const checkDate = media.first_air_date ?? media.release_date;
 
-    targetBox.append(template(context));
-  }
+        const context = {
+          id: media.id,
+          cover: displayCover(media.poster_path),
+          title: media.name ?? media.title,
+          originalTitle: media.original_name ?? media.original_title,
+          flag: displayLanguage(media.original_language, "img"),
+          language: displayLanguage(media.original_language, "txt"),
+          score: rateIt(media.vote_average),
+          overview: media.overview,
+          genreData: media.genre_ids,
+          genres: translateGenres(media.genre_ids),
+          year: checkDate ? checkDate.substring(0, 4) : "n.d.",
+        };
 
-}
+        targetBox.append(template(context));
+      }
+    break;
 
-const genresTemplating = () => {
+    case "genres":
+      template = Handlebars.compile($("#template_genreFilter_options").html());
 
-  const template = Handlebars.compile($('#template_genreFilter_options').html());
+      for (const genre of data) {
+        const context = {
+          genreName: genre.name,
+          genreCode: genre.id,
+        };
 
-  for (const genre of state.genres) {
-
-     const context = {
-       genreName: genre.name,
-       genreCode: genre.id,
-     };
-
-     genresFilterBox.append(template(context));
+        targetBox.append(template(context));
+      }
+    break;
   }
 
 }
 
 const updateDOM = (prop) => {
 
+  resetfilters();
+
   switch (prop) {
     case "movies":
-      mediaTemplating(state.movies.data, moviesBox);
-      showPagesIndex(prop);
-      checkForFavs(moviesBox);
-      break;
+      injectTemplates("media", state.movies.data, moviesBox);
+      paintPagesIndex(prop);
+      paintBookmarks(moviesBox);
+    break;
 
     case "series":
-      mediaTemplating(state.series.data, seriesBox);
-      showPagesIndex(prop);
-      checkForFavs(seriesBox);
-      break;
+      injectTemplates("media", state.series.data, seriesBox);
+      paintPagesIndex(prop);
+      paintBookmarks(seriesBox);
+    break;
 
     case "search":
-      mediaTemplating(state.search.data, searchResultsBox);
-      showPagesIndex(prop);
-      checkForFavs(searchResultsBox);
+      injectTemplates("media", state.search.data, searchResultsBox);
+      paintPagesIndex(prop);
+      paintBookmarks(searchResultsBox);
       mediaBox.scrollTop(1800);
-      break;
+    break;
 
     case "favs":
-      mediaTemplating(state.favs.onPage, favouritesBox);
-      showPagesIndex(prop);
-      checkForFavs(favouritesBox); 
-      saveFavsToStorage();
-      break;
+      injectTemplates("media", state.favs.onPage, favouritesBox);
+      paintPagesIndex(prop);
+      paintBookmarks(favouritesBox); 
+    break;
 
     case "genres":
-      genresTemplating();
-      break;
+      injectTemplates("genres", state.genres, genresFilterBox);
+    break;
   }
 
 }
@@ -344,7 +346,7 @@ const getFavsFromStorage = (page = 1) => {
 const recalculateFavs = (favs) => {
 
   const resultsPerPage = 20,
-    totalPages = Math.ceil(favs.length / resultsPerPage),
+    totalPages = Math.ceil(favs.length / resultsPerPage) || 1,
     page = (state.favs.currentPage <= totalPages) ? state.favs.currentPage : totalPages,
     first = (page - 1) * resultsPerPage,
     last = first + resultsPerPage;
@@ -367,7 +369,7 @@ function add_n_remove_Favs() {
   const bookmark = $(this),
         media = $(this).parents(".media"),
         mediaID = media.data('id'),
-        box = media.parent().siblings(".page_switchers").data("box");
+        box = media.parent().siblings(".pagination").data("box");
 
   let updatedFavs;
 
@@ -384,7 +386,7 @@ function add_n_remove_Favs() {
 
 }
 
-const checkForFavs = (box) => {
+const paintBookmarks = (box) => {
 
   box.children().each( function() {
     for(let media of state.favs.data) {
@@ -399,44 +401,72 @@ const checkForFavs = (box) => {
 
 /* Pagination */
 function page_switch() {
-
+  
   const box = $(this).parent().data("box"),
         direction = $(this).attr("class"),
         currentPage = state[box].currentPage,
         total_pages = state[box].totalPages,
-        nextPage = (direction === 'page-up') ? currentPage + 1 : currentPage - 1;
+        nextPage = direction === "page-up" ? currentPage + 1 : currentPage - 1;
 
   if (direction === "page-up" && currentPage < total_pages || direction === "page-down" && currentPage > 1) {
-
     switch (box) {
       case 'movies':
-          getMovies(nextPage);
-        break;
+        getMovies(nextPage);
+      break;
   
       case 'series':
-          getTVSeries(nextPage);
-        break;
+        getTVSeries(nextPage);
+      break;
   
       case 'favs':
-          getFavsFromStorage(nextPage);
-        break;
+        getFavsFromStorage(nextPage);
+      break;
   
       case 'search':
-          search('no-event', nextPage);
-        break;
+        search('no-event', nextPage);
+      break;
     }
   }
 
 }
 
-const showPagesIndex = (prop) => {
+function goToPage(e) {
 
-  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } ),
-        pagesIndex = `<span>${state[prop].currentPage} - ${state[prop].totalPages}</span>`;
-        
-  box.html("");
-  box.append(pagesIndex);
+  e.preventDefault();
 
+  const box = $(this).parent().data("box"),
+        nextPage = $(this).find("input[name='page']").val();
+
+  switch (box) {
+    case "movies":
+      getMovies(nextPage);
+    break;
+
+    case "series":
+      getTVSeries(nextPage);
+    break;
+
+    case "favs":
+      getFavsFromStorage(nextPage);
+    break;
+
+    case "search":
+      search("no-event", nextPage);
+    break;
+  }
+  return false;
+}
+
+const paintPagesIndex = (prop) => {
+  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } );
+
+  box.children("input").attr({
+    min: 1,
+    max: state[prop].totalPages,
+    value: state[prop].currentPage,
+  });
+  box.children("span").remove();
+  box.after().append(`<span>/${state[prop].totalPages}</span>`);
 }
 /* ------------ */
 
@@ -462,18 +492,16 @@ function filterForGenre() {
 
       if ( mediaGenreCodes.some((code) => code == filter) ) $(this).show();
       else $(this).hide();
-      
+ 
     });
   }
 
 }
 
 const resetfilters = () => {
-
   $(".media").each(function () { $(this).show() } );
   genresButton.removeClass("active");
   genresFilterBox.hide();
-
 }
 /* -------- */
 
@@ -520,6 +548,7 @@ const Boolflix = () => {
   setup();
 
   /* Listeners */
+  page_index.submit(goToPage);
   page_switchers.click(page_switch);
 
   genresButton.click(() => {
@@ -553,7 +582,7 @@ const Boolflix = () => {
   headbarNavigationButtons.click(headbarNavigation);
   mediaBox.scroll(scrollbarHeadbarSync);
  /* ------- */
- 
+
 }
 /* --- */
 $(document).ready(Boolflix);

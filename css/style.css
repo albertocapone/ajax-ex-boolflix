@@ -182,17 +182,17 @@ button:focus {
   scrollbar-width: thin;
 }
 
-.page_switchers {
+.pagination {
   position: absolute;
   top: 32px;
   right: 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100px;
+  width: 115px;
 }
 
-.page_switchers button {
+.pagination button {
   font-size: 23px;
   cursor: pointer;
   border: none;
@@ -202,10 +202,43 @@ button:focus {
 }
 
 .page_index {
-  font-size: 17px;
+  width: 80px;
+  font-size: 15px;
   color: rgba(255, 8, 0, 1);
-  text-shadow: 1px 1px hsl(0, 0%, 85%), 1px 2px hsl(0, 0%, 80%), 1px 3px hsl(0, 0%, 75%), 1px 4px 20px rgba(255, 0, 0, 0.9);
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input[name=page] {
+  width: 40%;
+  padding: 0 2px;
+  text-align: end;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+  background-color: inherit;
+}
+
+input[name="page"]:focus {
+  outline-color: rgba(255, 8, 0, 1);
+  outline-width: 3px;
+  /* outline-style: outset; */
+}
+
+.pagination:hover input[name=page] {
+  border: 1px solid rgba(255, 8, 0, 1);
+  border-radius: 5px;
+}
+
 
 .media {
   position: relative;
@@ -213,7 +246,7 @@ button:focus {
   max-width: calc(100% / 3 - 10px);
   margin: 5px 5px;
   border-radius: 5px;
-  transition: all .3s ease-out;
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .media:hover > .media_info {
