@@ -185,7 +185,7 @@ async function search(e, page = 1) {
     ...ajaxDefaults,
   };
   ajaxObject.data.page = page;
-  ajaxObject.data.query = state.search.query ?? searchInput.val();
+  ajaxObject.data.query = (e === "no-event") ? state.search.query : searchInput.val();
 
   const url = ajaxObject.url;
   let data;
@@ -197,11 +197,11 @@ async function search(e, page = 1) {
   const tv = await $.ajax(ajaxObject) ?? [];
 
   data = movies.results.concat(tv.results);
-
+  console.log(data);
   try {
     state.search = {
       query: ajaxObject.data.query,
-      totalPages: (movies.total_pages >= tv.total_pages) ? movies.total_pages : tv.total_pages,
+      totalPages: ((movies.total_pages >= tv.total_pages) ? movies.total_pages : tv.total_pages) || 1,
       currentPage: page,
       data: data,
     };
@@ -209,7 +209,7 @@ async function search(e, page = 1) {
     console.log(err);
     state.search = {
       query: null,
-      totalPages: null,
+      totalPages: 1,
       currentPage: 1,
       data: [],
     };
@@ -464,13 +464,8 @@ function goToPage(e) {
 
 const paintPagesIndex = (prop) => {
   const box = page_index.filter( function() { return $(this).parent().data("box") === prop } );
-
-  box.children("input").attr({
-    min: 1,
-    max: state[prop].totalPages,
-    value: state[prop].currentPage,
-  });
-  box.children("span").remove();
+  box.html("");
+  box.after().append(`<input type="number" name="page" min="1" max="${state[prop].totalPages}" value="${state[prop].currentPage}" />`);
   box.after().append(`<span>/${state[prop].totalPages}</span>`);
 }
 /* ------------ */
