@@ -75,84 +75,19 @@ function initVars() { //le variabili vengono dichiarate senza keyword in modo ch
 }
 /* ---------- */
 
-/* Media Info */
-const displayLanguage = (language, mode) => {
-
-  const toFlag = {
-    it: "img/it.png",
-    gb: "img/gb.png",
-    en: "img/en.png",
-    us: "img/us.png",
-    fr: "img/fr.png",
-    de: "img/de.png",
-    es: "img/es.png",
-    pt: "img/pt.png",
-    cn: "img/zh.png",
-    ru: "img/ru.png",
-    ja: "img/ja.png",
-    zh: "img/zh.png"
-  };
-
-  if (mode == "img") {
-    return toFlag[language] || "";
-  } else if (mode == "txt") {
-    return (toFlag[language] === undefined) ? language : "";
-  }
-
-}
-
-const rateIt = (vote) => {
-
-  const starredVote = (vote == 0) ? 1 : Math.round(vote / 2);
-  let starString = "";
-
-  for (let stars = 0; stars < 5; stars++) {
-
-    if (stars < starredVote)  starString += "<i class='fas fa-star'></i>";
-    else  starString += "<i class='far fa-star'></i>";
-  
-  }
-  return starString;
-
-}
-
-const displayCover = (coverPath) => {
-  return (coverPath) ? `https://image.tmdb.org/t/p//w500/${coverPath}` : "img/no_image.jpeg";
-
-}
-
-const translateGenres = (mediaGenreCodes = []) => {
-  
-  const genresTable = state.genres;
-  let genresList = [];
-
-  for(let e = 0; e < mediaGenreCodes.length; e++) {
-    let code = mediaGenreCodes[e];
-    for(let i = 0; i < genresTable.length; i++) {
-      if(code === genresTable[i].id) {
-        genresList.push(genresTable[i].name);
-        break;
-      }
-    }
-  }
-
-  return genresList.join(' ') || 'n.d.';
-}
-/* ------------- */
-
 /* API Calls */
 async function getMovies(page = 1) {
 
   const ajaxObject = {
     ...ajaxDefaults
   };
+  ajaxObject.url += 'discover/movie';
   ajaxObject.data.page = page;
   
-  ajaxObject.url += 'discover/movie';
   const movies = await $.ajax(ajaxObject);
 
   state.movies = {
-    totalPages: movies.total_pages,
+    totalPages: movies.total_pages || 1,
     currentPage: page,
     data: movies.results
   }
@@ -164,57 +99,39 @@ async function getTVSeries(page = 1) {
   const ajaxObject = {
     ...ajaxDefaults
   };
+  ajaxObject.url += "discover/tv";
   ajaxObject.data.page = page;
 
-  ajaxObject.url += "discover/tv";
   const TVseries = await $.ajax(ajaxObject);
 
   state.series = {
-    totalPages: TVseries.total_pages,
+    totalPages: TVseries.total_pages || 1,
     currentPage: page,
     data: TVseries.results
   };
 
 }
 
-async function search(e, page = 1) {
+async function search(event, page = 1) {
 
-  if (!searchInput.val().trim().length) return;
+  if ( !searchInput.val().trim().length ) return;
 
   const ajaxObject = {
     ...ajaxDefaults,
   };
+  ajaxObject.url += "search/multi";
   ajaxObject.data.page = page;
-  ajaxObject.data.query = (e === "no-event") ? state.search.query : searchInput.val();
+  ajaxObject.data.query = (event === "no-event") ? state.search.query : searchInput.val();
 
-  const url = ajaxObject.url;
-  let data;
+  const multi = await $.ajax(ajaxObject);
 
-  ajaxObject.url = `${url}search/movie`;
-  const movies = await $.ajax(ajaxObject) ?? [];
-
-  ajaxObject.url = `${url}search/tv`;
-  const tv = await $.ajax(ajaxObject) ?? [];
-
-  data = movies.results.concat(tv.results);
-  console.log(data);
-  try {
-    state.search = {
-      query: ajaxObject.data.query,
-      totalPages: ((movies.total_pages >= tv.total_pages) ? movies.total_pages : tv.total_pages) || 1,
-      currentPage: page,
-      data: data,
-    };
-  } catch (err) {
-    console.log(err);
-    state.search = {
-      query: null,
-      totalPages: 1,
-      currentPage: 1,
-      data: [],
-    };
-  }
-
+  state.search = {
+    query: ajaxObject.data.query,
+    totalPages: multi.total_pages || 1,
+    currentPage: page,
+    data: multi.results,
+  };
+  
 }
 
 async function getGenres() {
@@ -226,116 +143,26 @@ async function getGenres() {
   const url = ajaxObject.url;
 
   ajaxObject.url = url + 'genre/movie/list?';
-  const movie = (await $.ajax(ajaxObject)) ?? [];
+  const movie = (await $.ajax(ajaxObject));
 
   ajaxObject.url = url + "genre/tv/list?";
-  const tv = (await $.ajax(ajaxObject)) ?? [];
+  const tv = (await $.ajax(ajaxObject));
 
   const genres = movie.genres.concat(tv.genres);
   const sortedGenres = [...new Map( genres.map( genreObj => [genreObj['id'], genreObj] ) ).values()];
 
   state.genres = sortedGenres;
-
 }
 /* ------------- */
-
-/* DOM Update */
-const injectTemplates = (kind, data, targetBox) => {
-
-  let template;
-
-  switch (kind) {
-    case "media":
-      template = Handlebars.compile($("#template_media").html());
-
-      targetBox.html("");
-
-      for (const media of data) {
-        const checkDate = media.first_air_date ?? media.release_date;
-
-        const context = {
-          id: media.id,
-          cover: displayCover(media.poster_path),
-          title: media.name ?? media.title,
-          originalTitle: media.original_name ?? media.original_title,
-          flag: displayLanguage(media.original_language, "img"),
-          language: displayLanguage(media.original_language, "txt"),
-          score: rateIt(media.vote_average),
-          overview: media.overview,
-          genreData: media.genre_ids,
-          genres: translateGenres(media.genre_ids),
-          year: checkDate ? checkDate.substring(0, 4) : "n.d.",
-        };
-
-        targetBox.append(template(context));
-      }
-    break;
-
-    case "genres":
-      template = Handlebars.compile($("#template_genreFilter_options").html());
-
-      for (const genre of data) {
-        const context = {
-          genreName: genre.name,
-          genreCode: genre.id,
-        };
-
-        targetBox.append(template(context));
-      }
-    break;
-  }
-
-}
-
-const updateDOM = (prop) => {
-
-  resetfilters();
-
-  switch (prop) {
-    case "movies":
-      injectTemplates("media", state.movies.data, moviesBox);
-      paintPagesIndex(prop);
-      paintBookmarks(moviesBox);
-      console.log({"movies": state.movies});
-    break;
-
-    case "series":
-      injectTemplates("media", state.series.data, seriesBox);
-      paintPagesIndex(prop);
-      paintBookmarks(seriesBox);
-      console.log({"series": state.series});
-    break;
-
-    case "search":
-      injectTemplates("media", state.search.data, searchResultsBox);
-      paintPagesIndex(prop);
-      paintBookmarks(searchResultsBox);
-      mediaBox.scrollTop(1800);
-      console.log({"search": state.search});
-    break;
-
-    case "favs":
-      injectTemplates("media", state.favs.onPage, favouritesBox);
-      paintPagesIndex(prop);
-      paintBookmarks(favouritesBox); 
-      console.log({"favs": state.favs});
-    break;
-
-    case "genres":
-      injectTemplates("genres", state.genres, genresFilterBox);
-      console.log({"genres": state.genres});
-    break;
-  }
-
-}
-/* --- */
 
 /* Favourites */
 const getFavsFromStorage = (page = 1) => {
    
   const favourites = window.localStorage.getItem("favourites") ? JSON.parse(window.localStorage.getItem("favourites")) : [],
+        filter = Number(ajaxDefaults.data.with_genres),
+        eventuallyFilteredFavourites = (filter) ? favourites.filter( (fav) => fav.genre_ids.includes(filter)) : favourites,
         resultsPerPage = 20,
-        totalPages = Math.ceil(favourites.length / resultsPerPage),
+        totalPages = Math.ceil(eventuallyFilteredFavourites.length / resultsPerPage),
         first = (page - 1) * resultsPerPage,
         last = first + resultsPerPage;
 
@@ -343,7 +170,7 @@ const getFavsFromStorage = (page = 1) => {
     totalPages: totalPages || 1,
     currentPage: page,
     data: favourites,
-    onPage: favourites.slice(first, last)
+    onPage: eventuallyFilteredFavourites.slice(first, last),
   };
     
 };
@@ -351,16 +178,18 @@ const getFavsFromStorage = (page = 1) => {
 const recalculateFavs = (favs) => {
 
   const resultsPerPage = 20,
-    totalPages = Math.ceil(favs.length / resultsPerPage) || 1,
-    page = (state.favs.currentPage <= totalPages) ? state.favs.currentPage : totalPages,
-    first = (page - 1) * resultsPerPage,
-    last = first + resultsPerPage;
+        filter = ajaxDefaults.data.with_genres,
+        eventuallyFilteredFavourites = (filter) ? favs.filter( (fav) => fav.genre_ids.includes(filter)) : favs,
+        totalPages = Math.ceil(eventuallyFilteredFavourites.length / resultsPerPage) || 1,
+        page = (state.favs.currentPage <= totalPages) ? state.favs.currentPage : totalPages,
+        first = (page - 1) * resultsPerPage,
+        last = first + resultsPerPage;
 
   state.favs = {
     totalPages: totalPages || 1,
     currentPage: page,
     data: favs,
-    onPage: favs.slice(first, last),
+    onPage: eventuallyFilteredFavourites.slice(first, last),
   };
 
 }
@@ -391,18 +220,171 @@ function add_n_remove_Favs() {
 
 }
 
+/* -------- */
+
+/* DOM Update */
+const updateDOM = (prop) => {
+
+  switch (prop) {
+    case "movies":
+      injectTemplates("media", state.movies.data, moviesBox);
+      paintPagesIndex(prop);
+      paintBookmarks(moviesBox);
+      console.log("DOM UPDATE", { movies: state.movies });
+      break;
+
+    case "series":
+      injectTemplates("media", state.series.data, seriesBox);
+      paintPagesIndex(prop);
+      paintBookmarks(seriesBox);
+      console.log("DOM UPDATE", { series: state.series });
+      break;
+
+    case "search":
+      injectTemplates("media", state.search.data, searchResultsBox);
+      paintPagesIndex(prop);
+      paintBookmarks(searchResultsBox);
+      mediaBox.scrollTop(1800);
+      console.log("DOM UPDATE", { search: state.search });
+      break;
+
+    case "favs":
+      injectTemplates("media", state.favs.onPage, favouritesBox);
+      paintPagesIndex(prop);
+      paintBookmarks(favouritesBox);
+      console.log("DOM UPDATE", { favs: state.favs });
+      break;
+
+    case "genres":
+      injectTemplates("genres", state.genres, genresFilterBox);
+      console.log("DOM UPDATE", { genres: state.genres });
+      break;
+  }
+
+};
+
+
+const injectTemplates = (kind, data, targetBox) => {
+
+  let template;
+
+  switch (kind) {
+    case "media":
+      template = Handlebars.compile($("#template_media").html());
+
+      targetBox.html("");
+
+      for (const media of data) {
+        const checkDate = media.first_air_date ?? media.release_date;
+
+        const context = {
+          id: media.id,
+          cover: displayCover(media.poster_path),
+          title: media.name ?? media.title,
+          originalTitle: media.original_name ?? media.original_title,
+          flag: displayLanguage(media.original_language, "img"),
+          language: displayLanguage(media.original_language, "txt"),
+          score: rateIt(media.vote_average),
+          overview: media.overview,
+          genreData: media.genre_ids,
+          genres: translateGenres(media.genre_ids),
+          year: checkDate ? checkDate.substring(0, 4) : "n.d.",
+        };
+
+        targetBox.append(template(context));
+      }
+      break;
+
+    case "genres":
+      template = Handlebars.compile($("#template_genreFilter_options").html());
+
+      for (const genre of data) {
+        const context = {
+          genreName: genre.name,
+          genreCode: genre.id,
+        };
+
+        targetBox.append(template(context));
+      }
+      break;
+  }
+
+}
+
+const paintPagesIndex = (prop) => {
+
+  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } );
+  box.html("");
+  box.after().append(`<input type="number" name="page" min="1" max="${state[prop].totalPages}" value="${state[prop].currentPage}" />`);
+  box.after().append(`<span>/${state[prop].totalPages}</span>`);
+}
+
 const paintBookmarks = (box) => {
 
-  box.children().each( function() {
-    for(let media of state.favs.data) {
-      if( media.id === $(this).data('id') ) {
-        $(this).find(".bookmark").addClass("active");
-    }
-    }
+  box.children().each(function () {
+    for (let media of state.favs.data) 
+      if (media.id === $(this).data("id"))  $(this).find(".bookmark").addClass("active");
   });
-  
 }
-/* -------- */
+/* --- */
+
+/* Media Info Templating Utilities */
+const displayLanguage = (language, mode) => {
+
+  const toFlag = {
+    it: "img/it.png",
+    gb: "img/gb.png",
+    en: "img/en.png",
+    us: "img/us.png",
+    fr: "img/fr.png",
+    de: "img/de.png",
+    es: "img/es.png",
+    pt: "img/pt.png",
+    cn: "img/zh.png",
+    ru: "img/ru.png",
+    ja: "img/ja.png",
+    zh: "img/zh.png"
+  };
+
+  if (mode == "img") return toFlag[language] || "";
+  else if (mode == "txt") return (toFlag[language] === undefined) ? language : "";
+}
+
+const rateIt = (vote) => {
+
+  const starredVote = (vote == 0) ? 1 : Math.round(vote / 2);
+  let starString = "";
+
+  for (let stars = 0; stars < 5; stars++) {
+    if (stars < starredVote)  starString += "<i class='fas fa-star'></i>";
+    else  starString += "<i class='far fa-star'></i>";
+  }
+
+  return starString;
+}
+
+const displayCover = (coverPath) => {
+  return (coverPath) ? `https://image.tmdb.org/t/p//w500/${coverPath}` : "img/no_image.jpeg";
+}
+
+const translateGenres = (mediaGenreCodes = []) => {
+  
+  const genresTable = state.genres;
+  let genresList = [];
+
+  for(let e = 0; e < mediaGenreCodes.length; e++) {
+    let code = mediaGenreCodes[e];
+    for(let i = 0; i < genresTable.length; i++) {
+      if(code === genresTable[i].id) {
+        genresList.push(genresTable[i].name);
+        break;
+      }
+    }
+  }
+
+  return genresList.join(' ') || 'n.d.';
+}
+/* ------------- */
 
 /* Pagination */
 function page_switch() {
@@ -432,7 +414,6 @@ function page_switch() {
       break;
     }
   }
-
 }
 
 function goToPage(e) {
@@ -459,14 +440,8 @@ function goToPage(e) {
       search("no-event", nextPage);
     break;
   }
-  return false;
-}
 
-const paintPagesIndex = (prop) => {
-  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } );
-  box.html("");
-  box.after().append(`<input type="number" name="page" min="1" max="${state[prop].totalPages}" value="${state[prop].currentPage}" />`);
-  box.after().append(`<span>/${state[prop].totalPages}</span>`);
+  return false;
 }
 /* ------------ */
 
@@ -474,34 +449,12 @@ const paintPagesIndex = (prop) => {
 function filterForGenre() {
 
   const filter = $(this).val();
+  if(filter === "all")  delete ajaxDefaults.data.with_genres;
+  else  ajaxDefaults.data.with_genres = filter;
 
-  if (filter == "all") {
-
-    $(".media").each(function () { $(this).show() });
-
-  } else {
-
-    $(".media").each(function () {
-
-      let mediaGenreCodes = $(this).data("genre");
-
-      mediaGenreCodes = typeof mediaGenreCodes === "string" ?
-        mediaGenreCodes.split(",") 
-        :
-        [mediaGenreCodes];
-
-      if ( mediaGenreCodes.some((code) => code == filter) ) $(this).show();
-      else $(this).hide();
- 
-    });
-  }
-
-}
-
-const resetfilters = () => {
-  $(".media").each(function () { $(this).show() } );
-  genresButton.removeClass("active");
-  genresFilterBox.hide();
+  getMovies();
+  getTVSeries();
+  getFavsFromStorage();
 }
 /* -------- */
 
@@ -513,7 +466,6 @@ function headbarNavigation() {
   });
 
   $(this).addClass('active');
-
 }
 
 function scrollbarHeadbarSync() {
@@ -528,10 +480,10 @@ function scrollbarHeadbarSync() {
   else if (at >= 698 && at <= 1305) headbarNavigationButtons.eq(1).addClass('active');
   else if (at >= 1306 && at <= 1747) headbarNavigationButtons.eq(2).addClass('active');
   else  headbarNavigationButtons.eq(3).addClass('active');
-  
 }
 /* ---------- */
 
+/* On Start */
 const setup = () => {
   getGenres().then( () => {
     getFavsFromStorage();
@@ -539,6 +491,7 @@ const setup = () => {
     getTVSeries();
   });
 }
+/* ----- */
 
 /* App */
 const Boolflix = () => {
