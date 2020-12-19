@@ -175,29 +175,6 @@ const getFavsFromStorage = (page = 1) => {
     
 };
 
-const recalculateFavs = (favs) => {
-
-  const resultsPerPage = 20,
-        filter = ajaxDefaults.data.with_genres,
-        eventuallyFilteredFavourites = (filter) ? favs.filter( (fav) => fav.genre_ids.includes(filter)) : favs,
-        totalPages = Math.ceil(eventuallyFilteredFavourites.length / resultsPerPage) || 1,
-        page = (state.favs.currentPage <= totalPages) ? state.favs.currentPage : totalPages,
-        first = (page - 1) * resultsPerPage,
-        last = first + resultsPerPage;
-
-  state.favs = {
-    totalPages: totalPages || 1,
-    currentPage: page,
-    data: favs,
-    onPage: eventuallyFilteredFavourites.slice(first, last),
-  };
-
-}
-
-const saveFavsToStorage = () => {
-  window.localStorage.setItem("favourites", JSON.stringify(state.favs.data));
-};
-
 function add_n_remove_Favs() {
 
   const bookmark = $(this),
@@ -220,6 +197,28 @@ function add_n_remove_Favs() {
 
 }
 
+const recalculateFavs = (favs) => {
+
+  const resultsPerPage = 20,
+        filter = ajaxDefaults.data.with_genres,
+        eventuallyFilteredFavourites = (filter) ? favs.filter( (fav) => fav.genre_ids.includes(filter)) : favs,
+        totalPages = Math.ceil(eventuallyFilteredFavourites.length / resultsPerPage) || 1,
+        page = (state.favs.currentPage <= totalPages) ? state.favs.currentPage : totalPages,
+        first = (page - 1) * resultsPerPage,
+        last = first + resultsPerPage;
+
+  state.favs = {
+    totalPages: totalPages || 1,
+    currentPage: page,
+    data: favs,
+    onPage: eventuallyFilteredFavourites.slice(first, last),
+  };
+
+};
+
+const saveFavsToStorage = () => {
+  window.localStorage.setItem("favourites", JSON.stringify(state.favs.data));
+};
 /* -------- */
 
 /* DOM Update */
@@ -310,7 +309,7 @@ const injectTemplates = (kind, data, targetBox) => {
       break;
   }
 
-}
+};
 
 const paintPagesIndex = (prop) => {
 
@@ -318,7 +317,7 @@ const paintPagesIndex = (prop) => {
   box.html("");
   box.after().append(`<input type="number" name="page" min="1" max="${state[prop].totalPages}" value="${state[prop].currentPage}" />`);
   box.after().append(`<span>/${state[prop].totalPages}</span>`);
-}
+};
 
 const paintBookmarks = (box) => {
 
@@ -326,7 +325,7 @@ const paintBookmarks = (box) => {
     for (let media of state.favs.data) 
       if (media.id === $(this).data("id"))  $(this).find(".bookmark").addClass("active");
   });
-}
+};
 /* --- */
 
 /* Media Info Templating Utilities */
@@ -349,7 +348,7 @@ const displayLanguage = (language, mode) => {
 
   if (mode == "img") return toFlag[language] || "";
   else if (mode == "txt") return (toFlag[language] === undefined) ? language : "";
-}
+};
 
 const rateIt = (vote) => {
 
@@ -362,11 +361,11 @@ const rateIt = (vote) => {
   }
 
   return starString;
-}
+};
 
 const displayCover = (coverPath) => {
   return (coverPath) ? `https://image.tmdb.org/t/p//w500/${coverPath}` : "img/no_image.jpeg";
-}
+};
 
 const translateGenres = (mediaGenreCodes = []) => {
   
@@ -384,7 +383,7 @@ const translateGenres = (mediaGenreCodes = []) => {
   }
 
   return genresList.join(' ') || 'n.d.';
-}
+};
 /* ------------- */
 
 /* Pagination */
@@ -486,7 +485,7 @@ function scrollbarHeadbarSync() {
 const scrollTo = (hash) => {
   location.hash = null;
   location.hash = hash;
-}
+};
 /* ---------- */
 
 /* On Start */
@@ -496,7 +495,7 @@ const setup = () => {
     getMovies();
     getTVSeries();
   });
-}
+};
 /* ----- */
 
 /* App */
@@ -543,6 +542,6 @@ const Boolflix = () => {
   mediaBox.scroll(scrollbarHeadbarSync);
  /* ------- */
 
-}
+};
 /* --- */
 $(document).ready(Boolflix);
