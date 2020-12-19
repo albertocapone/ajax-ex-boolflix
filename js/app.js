@@ -289,6 +289,7 @@ const injectTemplates = (kind, data, targetBox) => {
           genreData: media.genre_ids,
           genres: translateGenres(media.genre_ids),
           year: checkDate ? checkDate.substring(0, 4) : "n.d.",
+          category: (media.title) ? "MOVIE" : "TV"           //film hanno sempre una prop title, le serie una name - per evitare di passare altri parametri a inject
         };
 
         targetBox.append(template(context));
