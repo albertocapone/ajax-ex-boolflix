@@ -121,7 +121,7 @@ async function search(event, page = 1) {
   };
   ajaxObject.url += "search/multi";
   ajaxObject.data.page = page;
-  ajaxObject.data.query = (event === "no-event") ? state.search.query : searchInput.val();
+  ajaxObject.data.query = (event === "turning-page") ? state.search.query : searchInput.val();
 
   const multi = await $.ajax(ajaxObject);
 
@@ -411,7 +411,7 @@ function page_switch() {
       break;
   
       case 'search':
-        search('no-event', nextPage);
+        search("turning-page", nextPage);
       break;
     }
   }
@@ -438,7 +438,7 @@ function goToPage(e) {
     break;
 
     case "search":
-      search("no-event", nextPage);
+      search("turning-page", nextPage);
     break;
   }
 
@@ -521,8 +521,9 @@ const Boolflix = () => {
     },
     focusout: () => {
       setTimeout( () => {
-        searchInput.val("Cerca un film o una serie-tv...");
-      }, 100);
+        const placeholder = (state.search.query) ? `Results for: "${state.search.query}"` : "Cerca un film o una serie-tv...";
+        searchInput.val(placeholder);
+      }, 300);
     },
     keydown: (e) => {
       if (e.which == 13) {
