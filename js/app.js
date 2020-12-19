@@ -1,5 +1,5 @@
 /* Variables */
-function initVars() { //le variabili vengono dichiarate senza keyword in modo che invocata initVars il loro scope sia globale
+function initVars() {   //le variabili vengono dichiarate senza keyword in modo che invocata initVars il loro scope sia globale
 
   //varie
   logo = new CircleType(document.getElementById("logo")).radius(600); //stilizzazione logo
@@ -121,7 +121,7 @@ async function search(event, page = 1) {
   };
   ajaxObject.url += "search/multi";
   ajaxObject.data.page = page;
-  ajaxObject.data.query = (event === "turning-page") ? state.search.query : searchInput.val();
+  ajaxObject.data.query = (event === "turning-page") ? state.search.query : searchInput.val().toLowerCase();
 
   const multi = await $.ajax(ajaxObject);
 
@@ -244,7 +244,7 @@ const updateDOM = (prop) => {
       injectTemplates("media", state.search.data, searchResultsBox);
       paintPagesIndex(prop);
       paintBookmarks(searchResultsBox);
-      mediaBox.scrollTop(1800);
+      scrollTo("search");
       console.log("DOM UPDATE", { search: state.search });
       break;
 
@@ -481,6 +481,11 @@ function scrollbarHeadbarSync() {
   else if (at >= 698 && at <= 1305) headbarNavigationButtons.eq(1).addClass('active');
   else if (at >= 1306 && at <= 1747) headbarNavigationButtons.eq(2).addClass('active');
   else  headbarNavigationButtons.eq(3).addClass('active');
+}
+
+const scrollTo = (hash) => {
+  location.hash = null;
+  location.hash = hash;
 }
 /* ---------- */
 
