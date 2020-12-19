@@ -60,7 +60,7 @@ function initVars() {   //le variabili vengono dichiarate senza keyword in modo 
     }
   };
 
-  state = new Proxy(state, handlestate);
+  state = new Proxy(state, handlestate);    //proxy agisce come event listener sull'oggetto contenente lo stato -- ogni aggiornamento innesca updateDom()
 
   //Ajax Defaults
   ajaxDefaults = {
@@ -149,7 +149,13 @@ async function getGenres() {
   const tv = (await $.ajax(ajaxObject));
 
   const genres = movie.genres.concat(tv.genres);
-  const sortedGenres = [...new Map( genres.map( genreObj => [genreObj['id'], genreObj] ) ).values()];
+
+  const sortedGenres = [
+    ...new Map(                                               // 0. genres [ {id: 35, name: 'Western'}, {id: 35, name: 'Western'} ] -- contiene duplicati
+      genres.map( genreObj => [ genreObj['id'], genreObj ] )  // 1. .map => [ [id, {}], [id, {}], ..] -- riorganizza esponendo id
+      )                                                       // 2. new Map => { id => {}, id => {}, ..} -- elimina duplicati | 3. .values() => { {}, {}, ..} -- espone valori
+    .values()                                                 // 4. [...<values>] => [ {}, {}, ..] -- copia i valori in nuovo array
+  ];
 
   state.genres = sortedGenres;
 }
@@ -468,7 +474,7 @@ function headbarNavigation() {
   $(this).addClass('active');
 }
 
-function scrollbarHeadbarSync() {
+function scrollbarHeadbarSync() {      
 
   const at = mediaBox.scrollTop();
 
