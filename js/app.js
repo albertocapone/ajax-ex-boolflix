@@ -87,7 +87,7 @@ async function getMovies(page = 1) {
   const movies = await $.ajax(ajaxObject);
 
   state.movies = {
-    totalPages: movies.total_pages || 1,
+    totalPages: movies.total_pages,
     currentPage: page,
     data: movies.results
   }
@@ -105,7 +105,7 @@ async function getTVSeries(page = 1) {
   const TVseries = await $.ajax(ajaxObject);
 
   state.series = {
-    totalPages: TVseries.total_pages || 1,
+    totalPages: TVseries.total_pages,
     currentPage: page,
     data: TVseries.results
   };
@@ -114,20 +114,20 @@ async function getTVSeries(page = 1) {
 
 async function search(event, page = 1) {
 
-  if ( !searchInput.val().trim().length ) return;
+  if (!searchInput.val().trim().length && event !== "page-change") return;
 
   const ajaxObject = {
     ...ajaxDefaults,
   };
   ajaxObject.url += "search/multi";
   ajaxObject.data.page = page;
-  ajaxObject.data.query = (event === "turning-page") ? state.search.query : searchInput.val().toLowerCase();
+  ajaxObject.data.query = (event === "page-change") ? state.search.query : searchInput.val().toLowerCase();
 
   const multi = await $.ajax(ajaxObject);
 
   state.search = {
     query: ajaxObject.data.query,
-    totalPages: multi.total_pages || 1,
+    totalPages: multi.total_pages,
     currentPage: page,
     data: multi.results,
   };
@@ -173,7 +173,7 @@ const getFavsFromStorage = (page = 1) => {
         last = first + resultsPerPage;
 
   state.favs = {
-    totalPages: totalPages || 1,
+    totalPages: totalPages,
     currentPage: page,
     data: favourites,
     onPage: eventuallyFilteredFavourites.slice(first, last),
@@ -183,21 +183,22 @@ const getFavsFromStorage = (page = 1) => {
 
 function add_n_remove_Favs() {
 
-  const bookmark = $(this),
-        media = $(this).parents(".media"),
-        mediaID = media.data('id'),
-        box = media.parent().siblings(".pagination").data("box");
+  const thisBookmark = $(this),
+        thisMedia = $(this).parents(".media"),
+        thisMediaID = thisMedia.data('id'),
+        thisMediaIsBookmarked = thisBookmark.hasClass("active"),
+        thisMediaBox = thisMedia.parent().siblings(".pagination").data("box");
 
   let updatedFavs;
 
-  if( bookmark.hasClass("active") ) {
-    $(".media").each( function() { if( $(this).data('id') === mediaID) $(this).find(".bookmark").removeClass("active") } );
-    updatedFavs = state.favs.data.filter((fav) => fav.id !== mediaID);
+  if(thisMediaIsBookmarked) {
+    $(".media").each( function() { if( $(this).data('id') === thisMediaID) $(this).find(".bookmark").removeClass("active") } );
+    updatedFavs = state.favs.data.filter((fav) => fav.id !== thisMediaID);
     recalculateFavs(updatedFavs);
   } 
-  else if( !bookmark.hasClass("active") ) {
-    bookmark.addClass("active");
-    updatedFavs = state[box].data.find((elm) => elm.id === mediaID);
+  else {
+    thisBookmark.addClass("active");
+    updatedFavs = state[thisMediaBox].data.find((elm) => elm.id === thisMediaID);
     recalculateFavs(state.favs.data.concat(updatedFavs));
   }
 
@@ -214,7 +215,7 @@ const recalculateFavs = (favs) => {
         last = first + resultsPerPage;
 
   state.favs = {
-    totalPages: totalPages || 1,
+    totalPages: totalPages,
     currentPage: page,
     data: favs,
     onPage: eventuallyFilteredFavourites.slice(first, last),
@@ -250,6 +251,7 @@ const updateDOM = (prop) => {
       paintPagesIndex(prop);
       paintBookmarks(searchResultsBox);
       scrollTo("search");
+      displayCurrentSearch();
       console.log("DOM UPDATE", { search: state.search });
       break;
 
@@ -317,12 +319,18 @@ const injectTemplates = (kind, data, targetBox) => {
 
 };
 
-const paintPagesIndex = (prop) => {
+const paintPagesIndex = (box) => {
+    const pageIndex = page_index.filter( function() { return $(this).parent().data("box") === box } ),
+          dataIsNotMissing = (state[box].data.length > 0) ? true : false,  
+          totalPages = state[box].totalPages || 1,
+          currentPage = state[box].currentPage;
 
-  const box = page_index.filter( function() { return $(this).parent().data("box") === prop } );
-  box.html("");
-  box.after().append(`<input type="number" name="page" min="1" max="${state[prop].totalPages}" value="${state[prop].currentPage}" />`);
-  box.after().append(`<span>/${state[prop].totalPages}</span>`);
+    pageIndex.html("");
+
+    if(dataIsNotMissing) {
+      pageIndex.after().append(`<input type="number" name="page" min="1" max="${totalPages}" value="${currentPage}" />`);
+      pageIndex.after().append(`<span>- ${totalPages}</span>`);
+    }
 };
 
 const paintBookmarks = (box) => {
@@ -332,6 +340,11 @@ const paintBookmarks = (box) => {
       if (media.id === $(this).data("id"))  $(this).find(".bookmark").addClass("active");
   });
 };
+
+const displayCurrentSearch = () => {
+  const placeholder = `Results for: "${state.search.query}"`;
+  searchInput.attr("placeholder", placeholder);
+}
 /* --- */
 
 /* Media Info Templating Utilities */
@@ -393,7 +406,7 @@ const translateGenres = (mediaGenreCodes = []) => {
 /* ------------- */
 
 /* Pagination */
-function page_switch() {
+function browsePages() {
   
   const box = $(this).parent().data("box"),
         direction = $(this).attr("class"),
@@ -416,7 +429,7 @@ function page_switch() {
       break;
   
       case 'search':
-        search("turning-page", nextPage);
+        search("page-change", nextPage);
       break;
     }
   }
@@ -443,7 +456,7 @@ function goToPage(e) {
     break;
 
     case "search":
-      search("turning-page", nextPage);
+      search("page-change", nextPage);
     break;
   }
 
@@ -513,7 +526,7 @@ const Boolflix = () => {
 
   /* Listeners */
   page_index.submit(goToPage);
-  page_switchers.click(page_switch);
+  page_switchers.click(browsePages);
 
   genresButton.click(() => {
     genresButton.toggleClass("active");
@@ -530,10 +543,7 @@ const Boolflix = () => {
       searchInput.val("");
     },
     focusout: () => {
-      setTimeout( () => {
-        const placeholder = (state.search.query) ? `Results for: "${state.search.query}"` : "Cerca un film o una serie-tv...";
-        searchInput.val(placeholder);
-      }, 300);
+      setTimeout( () => searchInput.val(""), 200)
     },
     keydown: (e) => {
       if (e.which == 13) {
